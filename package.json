@@ -1,0 +1,23 @@
+{
+  "name": "sigecom-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "install:backend": "cd apps/backend && npm install",
+    "install:frontend": "cd apps/frontend && npm install",
+    "install:all": "npm run install:backend && npm run install:frontend",
+    
+    "dev:backend": "cd apps/backend && npm run dev",
+    "dev:frontend": "cd apps/frontend && npm run dev",
+    "dev": "npm run dev:backend & npm run dev:frontend",
+    
+    "build:backend": "cd apps/backend && npm run build",
+    "build:frontend": "cd apps/frontend && npm run build",
+    
+    "start:backend": "cd apps/backend && npm start",
+    "start:frontend": "cd apps/frontend && npm start",
+    
+    "admin-manager": "cd apps/backend && npm run admin-manager",
+    "initialize": "cd apps/backend && npm run initialize"
+  }
+}
