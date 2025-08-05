@@ -48,14 +48,9 @@ export default async function personaComunidadConHistorialRoutes(
     handler: personaComunidadController.eliminar,
   });
 
-  // Descarga masiva
-  fastify.get("/download/excel", {
+  // Registrar historial de descarga
+  fastify.post("/registrar-descarga", {
     preHandler: [authenticate],
-    handler: personaComunidadController.descargarExcel,
-  });
-
-  fastify.get("/download/csv", {
-    preHandler: [authenticate],
-    handler: personaComunidadController.descargarCSV,
+    handler: personaComunidadController.registrarDescarga,
   });
 }

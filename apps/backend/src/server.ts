@@ -7,7 +7,6 @@ import authRoutes from "@/routes/auth.routes";
 import historialRoutes from "@/routes/historial.routes";
 import diccionarioColumnaRoutes from "@/routes/diccionario-columna.routes";
 import personaComunidadRoutes from "@/routes/persona-comunidad.routes";
-import personaComunidadConHistorialRoutes from "@/routes/persona-comunidad.routes";
 import { personaComunidadTemporalRoutes } from "@/routes/persona-comunidad-temporal.routes";
 import testRoutes from "@/routes/test.routes";
 
@@ -50,9 +49,8 @@ export function buildServer() {
   app.register(diccionarioColumnaRoutes, {
     prefix: "/api/diccionario-columnas",
   });
-  app.register(personaComunidadRoutes, { prefix: "/api/personas" });
-  app.register(personaComunidadConHistorialRoutes, {
-    prefix: "/api/personas-con-historial",
+  app.register(personaComunidadRoutes, {
+    prefix: "/api/personas",
   });
   app.register(personaComunidadTemporalRoutes, { prefix: "/api" });
   app.register(testRoutes, { prefix: "/api/test" });

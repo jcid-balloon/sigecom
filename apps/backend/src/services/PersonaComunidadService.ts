@@ -567,56 +567,22 @@ export class PersonaComunidadService {
   }
 
   /**
-   * Descargar datos con historial
+   * Registrar historial de descarga sin generar archivos
    */
-  static async descargarDatos(
+  static async registrarHistorialDescarga(
+    userId: string,
+    formato: "CSV" | "Excel" | "PDF",
+    cantidadRegistros: number,
     filtros: any,
-    formato: "CSV" | "Excel",
-    userId: string
+    nombreArchivo: string
   ) {
-    // 1. Obtener datos según filtros
-    const personas = await PersonaComunidadModel.find(filtros);
-
-    // 2. Crear historial de descarga
-    const nombreArchivo = `export_${Date.now()}.${formato.toLowerCase()}`;
     await HistorialService.crearHistorialDescarga(
       userId,
       formato,
-      personas.length,
+      cantidadRegistros,
       filtros,
       nombreArchivo
     );
-
-    // 3. Generar archivo csv
-    if (formato === "CSV") {
-      const csvData = personas.map((p) => {
-        const datos = p.datosAdicionales || {};
-        return datos;
-      });
-
-      const csvContent = [
-        Object.keys(csvData[0] || {}).join(","), // Cabecera
-        ...csvData.map((row) => Object.values(row).join(",")),
-      ].join("\n");
-
-      fs.writeFileSync(nombreArchivo, csvContent);
-    } else if (formato === "Excel") {
-      const excelData = personas.map((p) => {
-        const datos = p.datosAdicionales || {};
-        return datos;
-      });
-
-      const ws = XLSX.utils.json_to_sheet(excelData);
-      const wb = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(wb, ws, "Personas");
-      XLSX.writeFile(wb, nombreArchivo);
-    }
-
-    return {
-      datos: personas,
-      nombreArchivo,
-      cantidadRegistros: personas.length,
-    };
   }
 
   /**

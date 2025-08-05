@@ -211,53 +211,33 @@ const obtenerEstadoTrabajo = async (
   }
 };
 
-// Descargar Excel
-const descargarExcel = async (req: FastifyRequest, reply: FastifyReply) => {
+// Registrar descarga (solo historial, sin generar archivos)
+const registrarDescarga = async (req: FastifyRequest, reply: FastifyReply) => {
   try {
-    const filtros = req.query as any;
+    const { formato, cantidadRegistros, filtros } = req.body as {
+      formato: "CSV" | "Excel" | "PDF";
+      cantidadRegistros: number;
+      filtros?: any;
+    };
     const userId = (req.user as { id: string }).id;
 
-    const resultado = await PersonaComunidadService.descargarDatos(
-      filtros,
-      "Excel",
-      userId
+    // Solo crear historial, sin generar archivos
+    const nombreArchivo = `export_${Date.now()}.${formato.toLowerCase()}`;
+    await PersonaComunidadService.registrarHistorialDescarga(
+      userId,
+      formato,
+      cantidadRegistros,
+      filtros || {},
+      nombreArchivo
     );
 
     return reply.send({
       success: true,
-      message: `Descarga de ${resultado.cantidadRegistros} registros en formato Excel`,
-      nombreArchivo: resultado.nombreArchivo,
-      datos: resultado.datos,
+      message: `Descarga registrada: ${cantidadRegistros} registros en formato ${formato}`,
     });
   } catch (err: any) {
     return reply.code(500).send({
-      error: "Error al descargar Excel",
-      detail: err.message,
-    });
-  }
-};
-
-// Descargar CSV
-const descargarCSV = async (req: FastifyRequest, reply: FastifyReply) => {
-  try {
-    const filtros = req.query as any;
-    const userId = (req.user as { id: string }).id;
-
-    const resultado = await PersonaComunidadService.descargarDatos(
-      filtros,
-      "CSV",
-      userId
-    );
-
-    return reply.send({
-      success: true,
-      message: `Descarga de ${resultado.cantidadRegistros} registros en formato CSV`,
-      nombreArchivo: resultado.nombreArchivo,
-      datos: resultado.datos,
-    });
-  } catch (err: any) {
-    return reply.code(500).send({
-      error: "Error al descargar CSV",
+      error: "Error al registrar descarga",
       detail: err.message,
     });
   }
@@ -273,6 +253,5 @@ export const personaComunidadController = {
   cargarExcel,
   cargarCSV,
   obtenerEstadoTrabajo,
-  descargarExcel,
-  descargarCSV,
+  registrarDescarga,
 };

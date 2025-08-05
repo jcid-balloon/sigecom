@@ -23,13 +23,6 @@ export interface ProgresoCarga {
   historialCargaId?: string;
 }
 
-export interface DescargaResponse {
-  success: boolean;
-  message: string;
-  nombreArchivo: string;
-  datos: PersonaComunidad[];
-}
-
 export const personaComunidadService = {
   // Obtener todas las personas con filtros opcionales
   async obtenerPersonas(filtros?: {
@@ -43,38 +36,38 @@ export const personaComunidadService = {
     if (filtros?.apellido) params.append("apellido", filtros.apellido);
 
     const response = await api.get(
-      `/personas-con-historial?${params.toString()}`
+      `/personas?${params.toString()}`
     );
     return response.data;
   },
 
   // Obtener persona por ID
   async obtenerPersonaPorId(id: string) {
-    const response = await api.get(`/personas-con-historial/${id}`);
+    const response = await api.get(`/personas/${id}`);
     return response.data;
   },
 
   // Obtener persona por RUT
   async obtenerPersonaPorRut(rut: string) {
-    const response = await api.get(`/personas-con-historial/rut/${rut}`);
+    const response = await api.get(`/personas/rut/${rut}`);
     return response.data;
   },
 
   // Crear nueva persona (con historial automático)
   async crearPersona(persona: Omit<PersonaComunidad, "_id">) {
-    const response = await api.post("/personas-con-historial", persona);
+    const response = await api.post("/personas", persona);
     return response.data;
   },
 
   // Actualizar persona (con historial automático)
   async actualizarPersona(id: string, updates: Partial<PersonaComunidad>) {
-    const response = await api.put(`/personas-con-historial/${id}`, updates);
+    const response = await api.put(`/personas/${id}`, updates);
     return response.data;
   },
 
   // Eliminar persona (con historial automático)
   async eliminarPersona(id: string) {
-    const response = await api.delete(`/personas-con-historial/${id}`);
+    const response = await api.delete(`/personas/${id}`);
     return response.data;
   },
 
@@ -84,7 +77,7 @@ export const personaComunidadService = {
     formData.append("file", file);
 
     const response = await api.post(
-      "/personas-con-historial/upload-excel",
+      "/personas/upload-excel",
       formData,
       {
         headers: {
@@ -97,25 +90,21 @@ export const personaComunidadService = {
 
   // Consultar progreso de carga masiva
   async consultarProgresoCarga(jobId: string): Promise<ProgresoCarga> {
-    const response = await api.get(`/personas-con-historial/job/${jobId}`);
+    const response = await api.get(`/personas/job/${jobId}`);
     return response.data.data; // Extraer la data anidada del backend
   },
 
-  // Descargar datos con historial automático
-  async descargarDatos(
+  // Registrar descarga en el historial
+  async registrarDescarga(
     formato: "CSV" | "Excel" | "PDF",
+    cantidadRegistros: number,
     filtros?: any
-  ): Promise<DescargaResponse> {
-    const params = new URLSearchParams();
-    if (filtros) {
-      Object.keys(filtros).forEach((key) => {
-        if (filtros[key]) params.append(key, filtros[key]);
-      });
-    }
-
-    const response = await api.get(
-      `/personas-con-historial/download/${formato.toLowerCase()}?${params.toString()}`
-    );
+  ) {
+    const response = await api.post(`/personas/registrar-descarga`, {
+      formato,
+      cantidadRegistros,
+      filtros: filtros || {},
+    });
     return response.data;
   },
 };
