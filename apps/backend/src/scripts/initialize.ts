@@ -21,8 +21,8 @@ const initializeSystem = async () => {
       // Datos del administrador
       const adminData = {
         nombre: "Administrador",
-        email: "admin@balloonlatam.com",
-        password: "admin123",
+        email: process.env.DEFAULT_ADMIN_EMAIL || "admin@balloonlatam.com",
+        password: process.env.DEFAULT_ADMIN_PASSWORD || "admin123",
         rol: "admin",
       };
 
