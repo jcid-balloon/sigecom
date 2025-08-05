@@ -26,10 +26,20 @@ npm run install:frontend
 ## Construcción
 ```bash
 # Construir backend
-build:backend
+npm run build:backend
 
 # Construir frontend
-build:frontend
+npm run build:frontend
+```
+
+## Comandos de inicialización Backend
+
+``` bash
+# Inicializar el backend con un admin y columnas escenciales
+npm run initialize
+
+# Manejo de usuarios
+npm run admin-manager
 ```
 
 ## Uso
