@@ -6,7 +6,7 @@ import {
   Settings as SettingsIcon,
   BarChart3,
 } from "lucide-react";
-import { CargaMasiva } from "@/components/CargaMasiva";
+import CargaMasiva from "@/components/CargaMasiva";
 import { Historial } from "@/components/History";
 import Community from "@/components/Community";
 import Dashboard from "@/components/Dashboard";
