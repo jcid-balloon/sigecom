@@ -8,7 +8,7 @@ import {
 } from "lucide-react";
 import { CargaMasiva } from "@/components/CargaMasiva";
 import { Historial } from "@/components/History";
-import { Community } from "@/components/Community";
+import Community from "@/components/Community";
 import Dashboard from "@/components/Dashboard";
 import Settings from "@/components/Settings";
 import type { User } from "@/services/auth.service";
