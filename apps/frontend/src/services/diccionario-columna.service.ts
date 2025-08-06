@@ -2,7 +2,7 @@ import api from "./api";
 import type {
   DiccionarioColumna,
   MetadatosFormulario,
-} from "../types/columnas";
+} from "@/types/columnas";
 
 export interface DiccionarioResponse {
   success: boolean;

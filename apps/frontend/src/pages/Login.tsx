@@ -1,5 +1,5 @@
 import React, { useState, type JSX } from "react";
-import AuthService from "../services/auth.service";
+import AuthService from "@/services/auth.service";
 
 interface LoginPageProps {
   onLogin: (email: string) => void;

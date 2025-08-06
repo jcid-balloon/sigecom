@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState, type JSX } from "react";
 import {
   Upload,
   History,
@@ -6,12 +6,12 @@ import {
   Settings as SettingsIcon,
   BarChart3,
 } from "lucide-react";
-import { CargaMasiva } from "../components/CargaMasiva";
-import { Historial } from "../components/History";
-import { Community } from "../components/Community";
-import Dashboard from "../components/Dashboard";
-import Settings from "../components/Settings";
-import type { User } from "../services/auth.service";
+import { CargaMasiva } from "@/components/CargaMasiva";
+import { Historial } from "@/components/History";
+import { Community } from "@/components/Community";
+import Dashboard from "@/components/Dashboard";
+import Settings from "@/components/Settings";
+import type { User } from "@/services/auth.service";
 
 type ActiveTab =
   | "dashboard"
@@ -20,17 +20,18 @@ type ActiveTab =
   | "historial"
   | "configuracion";
 
-interface MainDashboardProps {
+interface MainPageProps {
   onLogout: () => void;
   currentUser: User | null;
 }
 
-const MainDashboard: React.FC<MainDashboardProps> = ({
+const MainPage = ({
   onLogout,
   currentUser,
-}) => {
+}: MainPageProps): JSX.Element => {
   const [activeTab, setActiveTab] = useState<ActiveTab>("dashboard");
 
+  // 
   const tabs = [
     { id: "dashboard" as ActiveTab, label: "Dashboard", icon: BarChart3 },
     { id: "comunidad" as ActiveTab, label: "Comunidad", icon: Users },
@@ -144,4 +145,4 @@ const MainDashboard: React.FC<MainDashboardProps> = ({
   );
 };
 
-export default MainDashboard;
+export default MainPage;
