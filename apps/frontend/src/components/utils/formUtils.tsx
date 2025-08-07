@@ -1,4 +1,4 @@
-import type { DiccionarioColumna } from '@/types/columnas';
+import type { DiccionarioColumna } from "@/types/columnas";
 
 /**
  * Renderiza un campo de entrada según el tipo de columna
@@ -128,9 +128,7 @@ export const renderCampoInput = (
           }
           maxLength={columna.longitudMaxima}
           pattern={
-            columna.tipoValidacion === "regex"
-              ? columna.validacion
-              : undefined
+            columna.tipoValidacion === "regex" ? columna.validacion : undefined
           }
           title={
             columna.tipoValidacion === "regex"
@@ -145,7 +143,10 @@ export const renderCampoInput = (
 /**
  * Muestra el valor de un campo formateado según su tipo
  */
-export const mostrarValorCampo = (columna: DiccionarioColumna, valor: string) => {
+export const mostrarValorCampo = (
+  columna: DiccionarioColumna,
+  valor: string
+) => {
   if (!valor) return "-";
 
   switch (columna.tipo) {

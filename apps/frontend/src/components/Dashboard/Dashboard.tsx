@@ -39,7 +39,8 @@ const Dashboard = () => {
   const filteredData = useMemo(() => {
     return mockCommunityData.filter((person) => {
       return (
-        (filters.territorio === "" || person.territorio === filters.territorio) &&
+        (filters.territorio === "" ||
+          person.territorio === filters.territorio) &&
         (filters.tipo === "" || person.tipo === filters.tipo) &&
         (filters.programa === "" || person.programa === filters.programa)
       );
@@ -75,7 +76,7 @@ const Dashboard = () => {
       {/* Sección de comunidad con filtros y tabla */}
       <div className="bg-white p-4 sm:p-6 rounded-xl shadow-md">
         <h2 className="text-xl font-semibold text-gray-700 mb-4">Comunidad</h2>
-        
+
         {/* Filtros */}
         <DashboardFilters
           filters={filters}
@@ -132,11 +133,11 @@ const Dashboard = () => {
             </tbody>
           </table>
         </div>
-        
+
         {filteredData.length > 5 && (
           <p className="text-sm text-gray-600 mt-4 text-center">
-            ...y {filteredData.length - 5} más. Ve a la sección 'Comunidad'
-            para ver todos los registros.
+            ...y {filteredData.length - 5} más. Ve a la sección 'Comunidad' para
+            ver todos los registros.
           </p>
         )}
       </div>

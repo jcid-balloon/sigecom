@@ -14,7 +14,9 @@ interface HistorialProps {
 }
 
 export const Historial = ({ tipoFiltro = "todos" }: HistorialProps) => {
-  const [historialCompleto, setHistorialCompleto] = useState<HistorialCompleto[]>([]);
+  const [historialCompleto, setHistorialCompleto] = useState<
+    HistorialCompleto[]
+  >([]);
   const [estadisticas, setEstadisticas] =
     useState<EstadisticasHistorial | null>(null);
   const [loading, setLoading] = useState(true);
@@ -25,9 +27,10 @@ export const Historial = ({ tipoFiltro = "todos" }: HistorialProps) => {
   const [filtroFecha, setFiltroFecha] = useState({ desde: "", hasta: "" });
 
   // Filtrar historial según el tipo seleccionado
-  const historial = filtroTipo === "todos" 
-    ? historialCompleto 
-    : historialCompleto.filter(item => item.tipoHistorial === filtroTipo);
+  const historial =
+    filtroTipo === "todos"
+      ? historialCompleto
+      : historialCompleto.filter((item) => item.tipoHistorial === filtroTipo);
 
   // Cargar datos
   useEffect(() => {
@@ -72,7 +75,9 @@ export const Historial = ({ tipoFiltro = "todos" }: HistorialProps) => {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-3xl font-bold text-gray-800">Historial de Actividad</h1>
+      <h1 className="text-3xl font-bold text-gray-800">
+        Historial de Actividad
+      </h1>
 
       {/* Estados de carga y error */}
       <LoadingState loading={loading} />

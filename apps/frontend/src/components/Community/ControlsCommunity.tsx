@@ -1,11 +1,11 @@
-import React from 'react';
-import { Search, Download, UserPlus } from 'lucide-react';
+import React from "react";
+import { Search, Download, UserPlus } from "lucide-react";
 
 interface ControlsCommunityProps {
   searchTerm: string;
   onSearchChange: (value: string) => void;
   onClearSearch: () => void;
-  onDownload: (format: 'CSV' | 'EXCEL') => void;
+  onDownload: (format: "CSV" | "EXCEL") => void;
   onShowCreateForm: () => void;
   isDownloading?: boolean;
   totalPersonas: number;
@@ -22,7 +22,7 @@ export const ControlsCommunity: React.FC<ControlsCommunityProps> = ({
   isDownloading = false,
   totalPersonas,
   personasFiltradas,
-  filtrosActivos
+  filtrosActivos,
 }) => {
   return (
     <div className="bg-white p-6 rounded-xl shadow-md mb-6">
@@ -34,7 +34,7 @@ export const ControlsCommunity: React.FC<ControlsCommunityProps> = ({
             Gestión de personas de la comunidad
           </p>
         </div>
-        
+
         <div className="flex flex-wrap gap-2">
           <button
             onClick={onShowCreateForm}
@@ -46,23 +46,23 @@ export const ControlsCommunity: React.FC<ControlsCommunityProps> = ({
 
           <div className="relative">
             <button
-              onClick={() => onDownload('CSV')}
+              onClick={() => onDownload("CSV")}
               disabled={isDownloading}
               className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
             >
               <Download className="h-4 w-4" />
-              <span>{isDownloading ? 'Descargando...' : 'CSV'}</span>
+              <span>{isDownloading ? "Descargando..." : "CSV"}</span>
             </button>
           </div>
 
           <div className="relative">
             <button
-              onClick={() => onDownload('EXCEL')}
+              onClick={() => onDownload("EXCEL")}
               disabled={isDownloading}
               className="bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
             >
               <Download className="h-4 w-4" />
-              <span>{isDownloading ? 'Descargando...' : 'Excel'}</span>
+              <span>{isDownloading ? "Descargando..." : "Excel"}</span>
             </button>
           </div>
         </div>
@@ -95,9 +95,7 @@ export const ControlsCommunity: React.FC<ControlsCommunityProps> = ({
         <span>Total: {totalPersonas}</span>
         <span>Mostrando: {personasFiltradas}</span>
         {searchTerm && (
-          <span className="text-blue-600">
-            Búsqueda: "{searchTerm}"
-          </span>
+          <span className="text-blue-600">Búsqueda: "{searchTerm}"</span>
         )}
         {filtrosActivos > 0 && (
           <span className="text-blue-600">

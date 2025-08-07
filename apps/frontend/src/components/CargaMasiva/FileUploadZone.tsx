@@ -1,5 +1,5 @@
-import React from 'react';
-import { FileUp } from 'lucide-react';
+import React from "react";
+import { FileUp } from "lucide-react";
 
 interface FileUploadZoneProps {
   file: File | null;
@@ -18,7 +18,7 @@ export const FileUploadZone: React.FC<FileUploadZoneProps> = ({
   onFileSelect,
   onDragOver,
   onDragLeave,
-  onDrop
+  onDrop,
 }) => {
   const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
@@ -59,7 +59,7 @@ export const FileUploadZone: React.FC<FileUploadZoneProps> = ({
           <label
             htmlFor="file-input"
             className={`inline-block bg-blue-600 text-white px-6 py-2 rounded-lg cursor-pointer hover:bg-blue-700 transition-colors ${
-              isProcessing ? 'opacity-50 cursor-not-allowed' : ''
+              isProcessing ? "opacity-50 cursor-not-allowed" : ""
             }`}
           >
             Seleccionar archivo
@@ -72,14 +72,14 @@ export const FileUploadZone: React.FC<FileUploadZoneProps> = ({
               ✓ Archivo seleccionado
             </div>
           </div>
-          
+
           <div className="bg-gray-50 rounded-lg p-4">
             <p className="font-medium text-gray-800">{file.name}</p>
             <p className="text-sm text-gray-600">
               Tamaño: {(file.size / 1024).toFixed(1)} KB
             </p>
             <p className="text-sm text-gray-600">
-              Tipo: {file.type || 'No especificado'}
+              Tipo: {file.type || "No especificado"}
             </p>
           </div>
 
@@ -88,7 +88,7 @@ export const FileUploadZone: React.FC<FileUploadZoneProps> = ({
               onClick={() => onFileSelect(file)}
               disabled={isProcessing}
               className={`flex-1 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors flex items-center justify-center space-x-2 ${
-                isProcessing ? 'opacity-50 cursor-not-allowed' : ''
+                isProcessing ? "opacity-50 cursor-not-allowed" : ""
               }`}
             >
               {isProcessing ? (
@@ -103,11 +103,11 @@ export const FileUploadZone: React.FC<FileUploadZoneProps> = ({
                 </>
               )}
             </button>
-            
+
             <label
               htmlFor="file-input"
               className={`bg-gray-200 text-gray-700 px-4 py-2 rounded-lg cursor-pointer hover:bg-gray-300 transition-colors ${
-                isProcessing ? 'opacity-50 cursor-not-allowed' : ''
+                isProcessing ? "opacity-50 cursor-not-allowed" : ""
               }`}
             >
               Cambiar

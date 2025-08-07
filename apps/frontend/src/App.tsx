@@ -1,7 +1,7 @@
 import { useState, useEffect, type JSX } from "react";
-import LoginPage from "./pages/Login";
-import MainDashboard from "./pages/MainDashboard";
-import AuthService, { type User } from "./services/auth.service";
+import LoginPage from "@/pages/Login";
+import MainPage from "@/pages/MainPage";
+import AuthService, { type User } from "@/services/auth.service";
 
 function App(): JSX.Element {
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(
@@ -79,7 +79,7 @@ function App(): JSX.Element {
     );
   }
 
-  return <MainDashboard onLogout={handleLogout} currentUser={currentUser} />;
+  return <MainPage onLogout={handleLogout} currentUser={currentUser} />;
 }
 
 export default App;

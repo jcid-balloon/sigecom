@@ -23,22 +23,24 @@ const Community = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
-  
+
   // Estados de filtros
   const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
   const [filtrosModulares, setFiltrosModulares] = useState<FiltroModular[]>([]);
-  
+
   // Estados de edición
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editingData, setEditingData] = useState<Partial<PersonaComunidad>>({});
-  const [originalEditingData, setOriginalEditingData] = useState<Partial<PersonaComunidad>>({});
-  
+  const [originalEditingData, setOriginalEditingData] = useState<
+    Partial<PersonaComunidad>
+  >({});
+
   // Estados de creación
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [newPersona, setNewPersona] = useState<Omit<PersonaComunidad, "_id">>({
     datosAdicionales: {},
   });
-  
+
   // Estados de descarga
   const [isDownloading, setIsDownloading] = useState(false);
 
@@ -72,15 +74,21 @@ const Community = () => {
 
       // Cargar columnas del diccionario
       try {
-        const columnasResponse = await diccionarioColumnaService.obtenerColumnasParaFrontend();
+        const columnasResponse =
+          await diccionarioColumnaService.obtenerColumnasParaFrontend();
         setColumnas(columnasResponse || []);
       } catch (columnasError) {
-        console.warn("Error al cargar columnas del diccionario:", columnasError);
+        console.warn(
+          "Error al cargar columnas del diccionario:",
+          columnasError
+        );
         setColumnas([]);
       }
     } catch (err: any) {
       console.error("Error al cargar datos:", err);
-      setError(err.response?.data?.detail || err.message || "Error al cargar datos");
+      setError(
+        err.response?.data?.detail || err.message || "Error al cargar datos"
+      );
       setPersonas([]);
       setColumnas([]);
     } finally {
@@ -92,27 +100,29 @@ const Community = () => {
   const agregarFiltro = () => {
     const nuevoFiltro: FiltroModular = {
       id: Date.now().toString(),
-      columna: '',
-      operador: '',
-      valor: '',
-      logica: 'AND'
+      columna: "",
+      operador: "",
+      valor: "",
+      logica: "AND",
     };
     setFiltrosModulares([...filtrosModulares, nuevoFiltro]);
   };
 
   const actualizarFiltro = (filtroActualizado: FiltroModular) => {
-    setFiltrosModulares(filtros =>
-      filtros.map(f => f.id === filtroActualizado.id ? filtroActualizado : f)
+    setFiltrosModulares((filtros) =>
+      filtros.map((f) =>
+        f.id === filtroActualizado.id ? filtroActualizado : f
+      )
     );
   };
 
   const eliminarFiltro = (id: string) => {
-    setFiltrosModulares(filtros => filtros.filter(f => f.id !== id));
+    setFiltrosModulares((filtros) => filtros.filter((f) => f.id !== id));
   };
 
-  const cambiarLogicaFiltro = (id: string, logica: 'AND' | 'OR') => {
-    setFiltrosModulares(filtros =>
-      filtros.map(f => f.id === id ? { ...f, logica } : f)
+  const cambiarLogicaFiltro = (id: string, logica: "AND" | "OR") => {
+    setFiltrosModulares((filtros) =>
+      filtros.map((f) => (f.id === id ? { ...f, logica } : f))
     );
   };
 
@@ -123,8 +133,11 @@ const Community = () => {
   };
 
   const contarFiltrosActivos = () => {
-    return filtrosModulares.filter(f => 
-      f.columna && f.operador && (f.valor !== '' || ['es_nulo', 'no_es_nulo'].includes(f.operador))
+    return filtrosModulares.filter(
+      (f) =>
+        f.columna &&
+        f.operador &&
+        (f.valor !== "" || ["es_nulo", "no_es_nulo"].includes(f.operador))
     ).length;
   };
 
@@ -152,12 +165,17 @@ const Community = () => {
         if (!persona?.datosAdicionales) return false;
 
         // Evaluar cada filtro
-        const resultadosFiltros = filtrosModulares.map(filtro => {
+        const resultadosFiltros = filtrosModulares.map((filtro) => {
           const valorPersona = persona.datosAdicionales[filtro.columna];
-          const columna = columnas.find(col => col.nombre === filtro.columna);
-          
+          const columna = columnas.find((col) => col.nombre === filtro.columna);
+
           if (!columna) return false;
-          return evaluarFiltro(valorPersona, filtro.operador, filtro.valor, columna.tipo);
+          return evaluarFiltro(
+            valorPersona,
+            filtro.operador,
+            filtro.valor,
+            columna.tipo
+          );
         });
 
         // Aplicar lógica de operadores AND/OR
@@ -168,7 +186,7 @@ const Community = () => {
         let resultado = resultadosFiltros[0];
         for (let i = 1; i < resultadosFiltros.length; i++) {
           const operadorLogico = filtrosModulares[i - 1].logica;
-          if (operadorLogico === 'AND') {
+          if (operadorLogico === "AND") {
             resultado = resultado && resultadosFiltros[i];
           } else {
             resultado = resultado || resultadosFiltros[i];
@@ -202,7 +220,9 @@ const Community = () => {
         datosAdicionales: newPersona.datosAdicionales || {},
       };
 
-      const response = await personaComunidadService.crearPersona(datosParaEnviar);
+      const response = await personaComunidadService.crearPersona(
+        datosParaEnviar
+      );
       if (response.success) {
         setPersonas((prev) => [...prev, response.data]);
         setNewPersona({ datosAdicionales: {} });
@@ -210,7 +230,9 @@ const Community = () => {
         setError(null);
       }
     } catch (err: any) {
-      setError(err.response?.data?.detail || err.message || "Error al crear persona");
+      setError(
+        err.response?.data?.detail || err.message || "Error al crear persona"
+      );
     }
   };
 
@@ -269,7 +291,9 @@ const Community = () => {
     } catch (err: any) {
       console.error("Error al actualizar persona:", err);
       setError(
-        err.response?.data?.detail || err.message || "Error al actualizar persona"
+        err.response?.data?.detail ||
+          err.message ||
+          "Error al actualizar persona"
       );
     }
   };
@@ -310,21 +334,28 @@ const Community = () => {
 
     try {
       if (personasFiltradas.length === 0) {
-        alert("⚠️ No hay datos para descargar. Verifique que hay personas registradas y que los filtros no estén muy restrictivos.");
+        alert(
+          "⚠️ No hay datos para descargar. Verifique que hay personas registradas y que los filtros no estén muy restrictivos."
+        );
         return;
       }
 
       // Generar archivo localmente usando la utilidad
-      generarArchivoLocal(personasFiltradas, columnas, formato === "EXCEL" ? "Excel" : formato);
+      generarArchivoLocal(
+        personasFiltradas,
+        columnas,
+        formato === "EXCEL" ? "Excel" : formato
+      );
 
       // Registrar la descarga en el historial del backend
       try {
         const informacionFiltros = {
           busquedaGeneral: searchTerm || undefined,
-          filtrosModulares: filtrosModulares.length > 0 ? filtrosModulares : undefined,
+          filtrosModulares:
+            filtrosModulares.length > 0 ? filtrosModulares : undefined,
           totalPersonas: personas.length,
           personasFiltradas: personasFiltradas.length,
-          fechaDescarga: new Date().toISOString()
+          fechaDescarga: new Date().toISOString(),
         };
 
         await personaComunidadService.registrarDescarga(
@@ -333,14 +364,17 @@ const Community = () => {
           informacionFiltros
         );
       } catch (historialError) {
-        console.warn("Error al registrar historial de descarga:", historialError);
+        console.warn(
+          "Error al registrar historial de descarga:",
+          historialError
+        );
       }
 
       const filtrosAplicados = searchTerm || contarFiltrosActivos() > 0;
-      const mensaje = filtrosAplicados 
+      const mensaje = filtrosAplicados
         ? `✅ Descarga completada con filtros aplicados: ${personasFiltradas.length} registros`
         : `✅ Descarga completada: ${personasFiltradas.length} registros`;
-      
+
       alert(mensaje);
     } catch (err: any) {
       console.error("Error al descargar:", err);

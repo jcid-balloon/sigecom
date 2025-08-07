@@ -25,13 +25,10 @@ interface MainPageProps {
   currentUser: User | null;
 }
 
-const MainPage = ({
-  onLogout,
-  currentUser,
-}: MainPageProps): JSX.Element => {
+const MainPage = ({ onLogout, currentUser }: MainPageProps): JSX.Element => {
   const [activeTab, setActiveTab] = useState<ActiveTab>("dashboard");
 
-  // 
+  //
   const tabs = [
     { id: "dashboard" as ActiveTab, label: "Dashboard", icon: BarChart3 },
     { id: "comunidad" as ActiveTab, label: "Comunidad", icon: Users },
@@ -114,8 +111,8 @@ const MainPage = ({
           </nav>
 
           {/* Main Content */}
-          <main className="flex-1">
-            <div className="bg-white rounded-lg shadow-sm">
+          <main className="flex-1 min-w-0">
+            <div className="bg-white rounded-lg shadow-sm overflow-hidden">
               <div className="p-6">
                 <div className="mb-6">
                   <h2 className="text-2xl font-bold text-gray-900">
@@ -135,7 +132,7 @@ const MainPage = ({
                   </p>
                 </div>
 
-                {renderContent()}
+                <div className="overflow-hidden min-w-0">{renderContent()}</div>
               </div>
             </div>
           </main>

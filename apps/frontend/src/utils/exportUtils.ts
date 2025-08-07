@@ -1,6 +1,6 @@
-import * as XLSX from 'xlsx';
-import type { PersonaComunidad } from '@/services/persona-comunidad.service';
-import type { DiccionarioColumna } from '@/types/columnas';
+import * as XLSX from "xlsx";
+import type { PersonaComunidad } from "@/services/persona-comunidad.service";
+import type { DiccionarioColumna } from "@/types/columnas";
 
 /**
  * Convierte un array de personas a formato CSV
@@ -11,15 +11,17 @@ export const convertirACSV = (
 ): string => {
   if (datos.length === 0) return "";
 
-  const headers = columnas.map(col => col.nombre);
+  const headers = columnas.map((col) => col.nombre);
   const csvHeaders = headers.join(",");
 
-  const csvRows = datos.map(persona => {
-    return headers.map(header => {
-      const valor = persona.datosAdicionales?.[header] || "";
-      // Escapar comillas y comas en CSV
-      return `"${String(valor).replace(/"/g, '""')}"`;
-    }).join(",");
+  const csvRows = datos.map((persona) => {
+    return headers
+      .map((header) => {
+        const valor = persona.datosAdicionales?.[header] || "";
+        // Escapar comillas y comas en CSV
+        return `"${String(valor).replace(/"/g, '""')}"`;
+      })
+      .join(",");
   });
 
   return [csvHeaders, ...csvRows].join("\n");
@@ -40,15 +42,17 @@ export const generarArchivoLocal = (
       alert("No hay datos para descargar");
       return;
     }
-    
-    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement('a');
+
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const link = document.createElement("a");
     link.href = URL.createObjectURL(blob);
-    link.download = nombreArchivo || `comunidad_${new Date().toISOString().split('T')[0]}.csv`;
+    link.download =
+      nombreArchivo ||
+      `comunidad_${new Date().toISOString().split("T")[0]}.csv`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-    
+
     // Limpiar la URL del blob
     setTimeout(() => {
       URL.revokeObjectURL(link.href);
@@ -61,16 +65,17 @@ export const generarArchivoLocal = (
 
     try {
       // Preparar datos para Excel
-      const headers = columnas.map(col => col.nombre);
-      const excelData = datos.map(persona => {
+      const headers = columnas.map((col) => col.nombre);
+      const excelData = datos.map((persona) => {
         const row: any = {};
-        headers.forEach(header => {
+        headers.forEach((header) => {
           const valor = persona.datosAdicionales?.[header] || "";
           // Formatear valores según el tipo de columna
-          const columna = columnas.find(col => col.nombre === header);
-          if (columna?.tipo === 'boolean') {
-            row[header] = valor === 'true' ? 'Sí' : valor === 'false' ? 'No' : valor;
-          } else if (columna?.tipo === 'date' && valor) {
+          const columna = columnas.find((col) => col.nombre === header);
+          if (columna?.tipo === "boolean") {
+            row[header] =
+              valor === "true" ? "Sí" : valor === "false" ? "No" : valor;
+          } else if (columna?.tipo === "date" && valor) {
             try {
               row[header] = new Date(valor).toLocaleDateString();
             } catch {
@@ -88,28 +93,32 @@ export const generarArchivoLocal = (
       const worksheet = XLSX.utils.json_to_sheet(excelData);
 
       // Ajustar ancho de columnas automáticamente
-      const columnWidths = headers.map(header => {
+      const columnWidths = headers.map((header) => {
         const maxLength = Math.max(
           header.length,
-          ...excelData.map(row => String(row[header] || '').length)
+          ...excelData.map((row) => String(row[header] || "").length)
         );
         return { wch: Math.min(maxLength + 2, 50) }; // Máximo 50 caracteres de ancho
       });
-      worksheet['!cols'] = columnWidths;
+      worksheet["!cols"] = columnWidths;
 
       // Agregar hoja al workbook
-      XLSX.utils.book_append_sheet(workbook, worksheet, 'Comunidad');
+      XLSX.utils.book_append_sheet(workbook, worksheet, "Comunidad");
 
       // Generar archivo y descargar
-      const fileName = nombreArchivo || `comunidad_${new Date().toISOString().split('T')[0]}.xlsx`;
+      const fileName =
+        nombreArchivo ||
+        `comunidad_${new Date().toISOString().split("T")[0]}.xlsx`;
       XLSX.writeFile(workbook, fileName);
     } catch (error) {
-      console.error('Error al generar archivo Excel:', error);
-      alert('Error al generar el archivo Excel. Intente con formato CSV.');
+      console.error("Error al generar archivo Excel:", error);
+      alert("Error al generar el archivo Excel. Intente con formato CSV.");
     }
   } else if (formato === "PDF") {
     // Por ahora, mostrar mensaje que PDF no está implementado
-    alert('La descarga en PDF estará disponible próximamente. Por favor use CSV o Excel.');
+    alert(
+      "La descarga en PDF estará disponible próximamente. Por favor use CSV o Excel."
+    );
   } else {
     alert(`Formato ${formato} no soportado actualmente. Use CSV o Excel.`);
   }

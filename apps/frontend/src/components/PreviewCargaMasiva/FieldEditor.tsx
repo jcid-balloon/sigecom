@@ -13,11 +13,13 @@ export const FieldEditor = ({
   onChange,
   hasError,
 }: FieldEditorProps) => {
-  const baseClassName = `w-full px-2 py-1 border rounded text-sm ${
+  const baseClassName = `px-2 py-1 border rounded text-sm ${
     hasError
       ? "border-red-300 bg-red-50 focus:ring-red-500 focus:border-red-500"
       : "border-gray-300 focus:ring-blue-500 focus:border-blue-500"
   } focus:ring-1 focus:outline-none`;
+
+  const baseStyle = { width: "230px", minWidth: "230px" };
 
   switch (columna.tipo) {
     case "select":
@@ -35,6 +37,7 @@ export const FieldEditor = ({
           value={valor || ""}
           onChange={(e) => onChange(e.target.value)}
           className={baseClassName}
+          style={baseStyle}
         >
           <option value="">Seleccionar...</option>
           {opciones.map((opcion, index) => (
@@ -51,6 +54,7 @@ export const FieldEditor = ({
           value={valor || ""}
           onChange={(e) => onChange(e.target.value)}
           className={baseClassName}
+          style={baseStyle}
           rows={2}
         />
       );
@@ -61,6 +65,7 @@ export const FieldEditor = ({
           value={valor || ""}
           onChange={(e) => onChange(e.target.value)}
           className={baseClassName}
+          style={baseStyle}
         >
           <option value="">Seleccionar...</option>
           <option value="true">Sí</option>
@@ -75,6 +80,7 @@ export const FieldEditor = ({
           value={valor || ""}
           onChange={(e) => onChange(e.target.value)}
           className={baseClassName}
+          style={baseStyle}
         />
       );
 
@@ -85,6 +91,7 @@ export const FieldEditor = ({
           value={valor || ""}
           onChange={(e) => onChange(e.target.value)}
           className={baseClassName}
+          style={baseStyle}
         />
       );
 
@@ -95,6 +102,7 @@ export const FieldEditor = ({
           value={valor || ""}
           onChange={(e) => onChange(e.target.value)}
           className={baseClassName}
+          style={baseStyle}
         />
       );
 
@@ -105,6 +113,7 @@ export const FieldEditor = ({
           value={valor || ""}
           onChange={(e) => onChange(e.target.value)}
           className={baseClassName}
+          style={baseStyle}
         />
       );
   }

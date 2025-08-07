@@ -1,8 +1,12 @@
-import React from 'react';
-import { Edit2, Trash2, CheckCircle, AlertCircle } from 'lucide-react';
-import type { PersonaComunidad } from '@/services/persona-comunidad.service';
-import type { DiccionarioColumna } from '@/types/columnas';
-import { renderCampoInput, mostrarValorCampo } from '@/utils/formUtils';
+import React, { useState } from "react";
+import { Edit2, Trash2, CheckCircle, AlertCircle, Info } from "lucide-react";
+import type { PersonaComunidad } from "@/services/persona-comunidad.service";
+import type { DiccionarioColumna } from "@/types/columnas";
+import {
+  renderCampoInput,
+  mostrarValorCampo,
+} from "@/components/utils/formUtils";
+import InfoModal from "@/components/utils/InfoModal";
 
 interface PersonasTablaProps {
   personas: PersonaComunidad[];
@@ -27,8 +31,40 @@ export const PersonasTabla: React.FC<PersonasTablaProps> = ({
   onSaveEdit,
   onCancelEdit,
   onDelete,
-  onEditingDataChange
+  onEditingDataChange,
 }) => {
+  const [infoModal, setInfoModal] = useState<{
+    isOpen: boolean;
+    title: string;
+    content: string;
+    tooltipMode: boolean;
+    mousePosition?: { x: number; y: number };
+  }>({
+    isOpen: false,
+    title: "",
+    content: "",
+    tooltipMode: false,
+  });
+
+  const handleInfoClick = (
+    columna: DiccionarioColumna,
+    event: React.MouseEvent
+  ) => {
+    if (columna.descripcion) {
+      event.preventDefault();
+      setInfoModal({
+        isOpen: true,
+        title: columna.nombre,
+        content: columna.descripcion,
+        tooltipMode: true,
+        mousePosition: { x: event.clientX, y: event.clientY },
+      });
+    }
+  };
+
+  const handleInfoMouseLeave = () => {
+    setInfoModal((prev) => ({ ...prev, isOpen: false }));
+  };
   if (columnas.length === 0) {
     return (
       <div className="bg-white rounded-xl shadow-md overflow-hidden">
@@ -37,8 +73,8 @@ export const PersonasTabla: React.FC<PersonasTablaProps> = ({
             No hay columnas configuradas
           </h3>
           <p className="text-gray-600 mb-4">
-            Debe configurar las columnas en la sección de Configuración
-            antes de gestionar personas.
+            Debe configurar las columnas en la sección de Configuración antes de
+            gestionar personas.
           </p>
         </div>
       </div>
@@ -48,26 +84,41 @@ export const PersonasTabla: React.FC<PersonasTablaProps> = ({
   return (
     <div className="bg-white rounded-xl shadow-md overflow-hidden">
       {/* Contenedor de tabla con scroll horizontal controlado */}
-      <div className="overflow-x-auto" style={{ maxWidth: '100%' }}>
-        <table className="w-full" style={{ minWidth: 'max-content' }}>
+      <div className="overflow-x-auto" style={{ maxWidth: "100%" }}>
+        <table className="w-full" style={{ minWidth: "max-content" }}>
           <thead className="bg-gray-50 sticky top-0 z-10">
             <tr>
               {columnas.map((columna) => (
                 <th
                   key={columna._id}
                   className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap"
-                  style={{ minWidth: '200px' }}
+                  style={{ minWidth: "200px" }}
                 >
-                  {columna.nombre}
-                  {columna.requerido && (
-                    <span className="text-red-500 ml-1">*</span>
-                  )}
+                  <div className="flex items-center space-x-2">
+                    <span>
+                      {columna.nombre}
+                      {columna.requerido && (
+                        <span className="text-red-500 ml-1">*</span>
+                      )}
+                    </span>
+                    {columna.descripcion && (
+                      <div>
+                        <Info
+                          className="h-3 w-3 text-gray-400 hover:text-gray-600 cursor-pointer"
+                          onMouseEnter={(event) =>
+                            handleInfoClick(columna, event)
+                          }
+                          onMouseLeave={handleInfoMouseLeave}
+                        />
+                      </div>
+                    )}
+                  </div>
                 </th>
               ))}
               {/* Columna de acciones sticky */}
-              <th 
+              <th
                 className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap sticky right-0 bg-gray-50 border-l border-gray-200 shadow-lg z-20"
-                style={{ minWidth: '120px' }}
+                style={{ minWidth: "120px" }}
               >
                 Acciones
               </th>
@@ -93,13 +144,14 @@ export const PersonasTabla: React.FC<PersonasTablaProps> = ({
                     <td
                       key={columna._id}
                       className="px-6 py-4 text-sm text-gray-900"
-                      style={{ minWidth: '200px' }}
+                      style={{ minWidth: "200px" }}
                     >
                       {editingId === persona._id ? (
-                        <div className="w-full" style={{ minWidth: '180px' }}>
+                        <div className="w-full" style={{ minWidth: "180px" }}>
                           {renderCampoInput(
                             columna,
-                            editingData.datosAdicionales?.[columna.nombre] || "",
+                            editingData.datosAdicionales?.[columna.nombre] ||
+                              "",
                             (valor) =>
                               onEditingDataChange({
                                 ...editingData,
@@ -124,9 +176,9 @@ export const PersonasTabla: React.FC<PersonasTablaProps> = ({
                   ))}
 
                   {/* Celda de acciones sticky */}
-                  <td 
+                  <td
                     className="px-6 py-4 text-sm sticky right-0 bg-white border-l border-gray-200 shadow-lg z-20"
-                    style={{ minWidth: '120px' }}
+                    style={{ minWidth: "120px" }}
                   >
                     {editingId === persona._id ? (
                       <div className="flex space-x-2 justify-center">
@@ -170,6 +222,15 @@ export const PersonasTabla: React.FC<PersonasTablaProps> = ({
           </tbody>
         </table>
       </div>
+
+      <InfoModal
+        isOpen={infoModal.isOpen}
+        onClose={() => setInfoModal((prev) => ({ ...prev, isOpen: false }))}
+        title={infoModal.title}
+        content={infoModal.content}
+        tooltipMode={infoModal.tooltipMode}
+        mousePosition={infoModal.mousePosition}
+      />
     </div>
   );
 };

@@ -14,11 +14,13 @@ interface CommunityPreviewTableProps {
   filteredData: CommunityPerson[];
 }
 
-const CommunityPreviewTable = ({ filteredData }: CommunityPreviewTableProps) => {
+const CommunityPreviewTable = ({
+  filteredData,
+}: CommunityPreviewTableProps) => {
   return (
     <div className="bg-white p-4 sm:p-6 rounded-xl shadow-md">
       <h2 className="text-xl font-semibold text-gray-700 mb-4">Comunidad</h2>
-      
+
       <div className="overflow-x-auto">
         <table className="min-w-full bg-white">
           <thead className="bg-gray-50">
@@ -65,11 +67,11 @@ const CommunityPreviewTable = ({ filteredData }: CommunityPreviewTableProps) => 
           </tbody>
         </table>
       </div>
-      
+
       {filteredData.length > 5 && (
         <p className="text-sm text-gray-600 mt-4 text-center">
-          ...y {filteredData.length - 5} más. Ve a la sección 'Comunidad'
-          para ver todos los registros.
+          ...y {filteredData.length - 5} más. Ve a la sección 'Comunidad' para
+          ver todos los registros.
         </p>
       )}
     </div>

@@ -1,6 +1,6 @@
-import React from 'react';
-import { Clock, CheckCircle, AlertCircle, X } from 'lucide-react';
-import type { ProgresoCarga } from '@/services/persona-comunidad.service';
+import React from "react";
+import { Clock, CheckCircle, AlertCircle, X } from "lucide-react";
+import type { ProgresoCarga } from "@/services/persona-comunidad.service";
 
 interface ProgressDisplayProps {
   progreso: ProgresoCarga;
@@ -9,15 +9,15 @@ interface ProgressDisplayProps {
 
 export const ProgressDisplay: React.FC<ProgressDisplayProps> = ({
   progreso,
-  onReset
+  onReset,
 }) => {
   const getStatusIcon = () => {
     switch (progreso.status) {
-      case 'processing':
+      case "processing":
         return <Clock className="h-5 w-5 text-blue-600 animate-pulse" />;
-      case 'completed':
+      case "completed":
         return <CheckCircle className="h-5 w-5 text-green-600" />;
-      case 'failed':
+      case "failed":
         return <AlertCircle className="h-5 w-5 text-red-600" />;
       default:
         return <Clock className="h-5 w-5 text-gray-600" />;
@@ -26,27 +26,27 @@ export const ProgressDisplay: React.FC<ProgressDisplayProps> = ({
 
   const getStatusText = () => {
     switch (progreso.status) {
-      case 'processing':
-        return 'Procesando...';
-      case 'completed':
-        return 'Completado';
-      case 'failed':
-        return 'Error';
+      case "processing":
+        return "Procesando...";
+      case "completed":
+        return "Completado";
+      case "failed":
+        return "Error";
       default:
-        return 'Iniciando...';
+        return "Iniciando...";
     }
   };
 
   const getStatusColor = () => {
     switch (progreso.status) {
-      case 'processing':
-        return 'text-blue-600';
-      case 'completed':
-        return 'text-green-600';
-      case 'failed':
-        return 'text-red-600';
+      case "processing":
+        return "text-blue-600";
+      case "completed":
+        return "text-green-600";
+      case "failed":
+        return "text-red-600";
       default:
-        return 'text-gray-600';
+        return "text-gray-600";
     }
   };
 
@@ -77,9 +77,7 @@ export const ProgressDisplay: React.FC<ProgressDisplayProps> = ({
             {getStatusText()}
           </span>
           {progreso.jobId && (
-            <span className="text-xs text-gray-500">
-              Job: {progreso.jobId}
-            </span>
+            <span className="text-xs text-gray-500">Job: {progreso.jobId}</span>
           )}
         </div>
 
@@ -92,11 +90,11 @@ export const ProgressDisplay: React.FC<ProgressDisplayProps> = ({
           <div className="w-full bg-gray-200 rounded-full h-2">
             <div
               className={`h-2 rounded-full transition-all duration-300 ${
-                progreso.status === 'completed' 
-                  ? 'bg-green-500' 
-                  : progreso.status === 'failed'
-                  ? 'bg-red-500'
-                  : 'bg-blue-500'
+                progreso.status === "completed"
+                  ? "bg-green-500"
+                  : progreso.status === "failed"
+                  ? "bg-red-500"
+                  : "bg-blue-500"
               }`}
               style={{ width: `${porcentaje}%` }}
             ></div>
@@ -105,14 +103,12 @@ export const ProgressDisplay: React.FC<ProgressDisplayProps> = ({
             <span>
               {procesados} de {total} registros procesados
             </span>
-            {progreso.status === 'processing' && (
-              <span>Procesando...</span>
-            )}
+            {progreso.status === "processing" && <span>Procesando...</span>}
           </div>
         </div>
 
         {/* Detalles adicionales */}
-        {progreso.status === 'completed' && (
+        {progreso.status === "completed" && (
           <div className="bg-green-50 border border-green-200 rounded-lg p-3">
             <div className="flex items-center space-x-2">
               <CheckCircle className="h-4 w-4 text-green-600" />
@@ -126,7 +122,7 @@ export const ProgressDisplay: React.FC<ProgressDisplayProps> = ({
           </div>
         )}
 
-        {progreso.status === 'failed' && (
+        {progreso.status === "failed" && (
           <div className="bg-red-50 border border-red-200 rounded-lg p-3">
             <div className="flex items-center space-x-2">
               <AlertCircle className="h-4 w-4 text-red-600" />

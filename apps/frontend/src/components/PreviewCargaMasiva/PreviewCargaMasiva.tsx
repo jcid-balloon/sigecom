@@ -8,9 +8,9 @@ import type {
   PreviewSesion,
 } from "@/types/persona-comunidad-temporal";
 import type { DiccionarioColumna } from "@/types/columnas";
-import { PreviewSummary } from "@/components/PreviewCarga/PreviewSummary";
-import { PreviewTable } from "@/components/PreviewCarga/PreviewTable";
-import { PreviewControls } from "@/components/PreviewCarga/PreviewControls";
+import { PreviewSummary } from "./PreviewSummary";
+import { PreviewTable } from "./PreviewTable";
+import { PreviewControls } from "./PreviewControls";
 
 interface PreviewCargaMasivaProps {
   sesionId: string;
@@ -259,7 +259,7 @@ const PreviewCargaMasiva = ({
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 w-full">
       {/* Header */}
       <div className="bg-white p-6 rounded-xl shadow-md">
         <div className="flex items-center justify-between mb-4">
@@ -304,18 +304,20 @@ const PreviewCargaMasiva = ({
         )}
       </div>
 
-      {/* Tabla de datos */}
-      <PreviewTable
-        registros={preview.registros}
-        columnas={columnas}
-        editingId={editingId}
-        editingData={editingData}
-        onEditingDataChange={setEditingData}
-        onStartEdit={iniciarEdicion}
-        onSaveEdit={guardarEdicion}
-        onCancelEdit={cancelarEdicion}
-        onDeleteRecord={eliminarRegistro}
-      />
+      {/* Tabla de datos - Sin overflow-hidden para permitir sticky */}
+      <div className="w-full">
+        <PreviewTable
+          registros={preview.registros}
+          columnas={columnas}
+          editingId={editingId}
+          editingData={editingData}
+          onEditingDataChange={setEditingData}
+          onStartEdit={iniciarEdicion}
+          onSaveEdit={guardarEdicion}
+          onCancelEdit={cancelarEdicion}
+          onDeleteRecord={eliminarRegistro}
+        />
+      </div>
 
       {/* Controles */}
       <PreviewControls

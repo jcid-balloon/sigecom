@@ -2,7 +2,7 @@ import React, { useState, useCallback } from "react";
 import { AlertCircle } from "lucide-react";
 import { personaComunidadService } from "@/services/persona-comunidad.service";
 import { PersonaComunidadTemporalService } from "@/services/persona-comunidad-temporal.service";
-import { PreviewCargaMasiva } from "../PreviewCargaMasiva";
+import PreviewCargaMasiva from "@/components/PreviewCargaMasiva";
 import { FileUploadZone } from "./FileUploadZone";
 import { ProgressDisplay } from "./ProgressDisplay";
 import type { ProgresoCarga } from "@/services/persona-comunidad.service";
@@ -31,7 +31,9 @@ const CargaMasiva: React.FC<CargaMasivaProps> = ({ onCargaCompleta }) => {
     async (currentJobId: string) => {
       try {
         console.log("Consultando progreso para jobId:", currentJobId);
-        const response = await personaComunidadService.consultarProgresoCarga(currentJobId);
+        const response = await personaComunidadService.consultarProgresoCarga(
+          currentJobId
+        );
         console.log("Progreso recibido:", response);
         setProgreso(response);
 
@@ -95,7 +97,7 @@ const CargaMasiva: React.FC<CargaMasivaProps> = ({ onCargaCompleta }) => {
           const values = lines[i]
             .split(",")
             .map((v) => v.trim().replace(/"/g, ""));
-          
+
           if (values.length === headers.length) {
             const rowData: any = {};
             headers.forEach((header, index) => {
@@ -111,10 +113,11 @@ const CargaMasiva: React.FC<CargaMasivaProps> = ({ onCargaCompleta }) => {
       console.log("Datos parseados:", datosParseados.slice(0, 3));
 
       // Enviar a procesamiento temporal
-      const response = await PersonaComunidadTemporalService.procesarDatosParaPreview(
-        datosParseados,
-        sesionId || undefined
-      );
+      const response =
+        await PersonaComunidadTemporalService.procesarDatosParaPreview(
+          datosParseados,
+          sesionId || undefined
+        );
 
       console.log("Respuesta del procesamiento temporal:", response);
 
@@ -123,9 +126,7 @@ const CargaMasiva: React.FC<CargaMasivaProps> = ({ onCargaCompleta }) => {
         setMostrarPreview(true);
         setError(null);
       } else {
-        throw new Error(
-          "Error al procesar el archivo en el servidor"
-        );
+        throw new Error("Error al procesar el archivo en el servidor");
       }
     } catch (err: any) {
       console.error("Error procesando archivo:", err);
@@ -144,12 +145,15 @@ const CargaMasiva: React.FC<CargaMasivaProps> = ({ onCargaCompleta }) => {
 
     try {
       console.log("Iniciando carga definitiva para sesión:", sesionId);
-      const response = await PersonaComunidadTemporalService.confirmarCargaDefinitiva(sesionId);
+      const response =
+        await PersonaComunidadTemporalService.confirmarCargaDefinitiva(
+          sesionId
+        );
       console.log("Respuesta confirmación carga:", response);
 
       if (response.success) {
         console.log("Carga definitiva completada:", response.data);
-        
+
         // Simular progreso completado usando sesionId como jobId
         setJobId(sesionId);
         setProgreso({
@@ -158,9 +162,9 @@ const CargaMasiva: React.FC<CargaMasivaProps> = ({ onCargaCompleta }) => {
           progreso: {
             total: response.data.creados + response.data.actualizados,
             procesados: response.data.creados + response.data.actualizados,
-            porcentaje: 100
+            porcentaje: 100,
           },
-          errores: response.data.errores
+          errores: response.data.errores,
         });
 
         // Mostrar mensaje de éxito
@@ -218,7 +222,7 @@ const CargaMasiva: React.FC<CargaMasivaProps> = ({ onCargaCompleta }) => {
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
     setIsDragging(false);
-    
+
     const droppedFile = e.dataTransfer.files[0];
     if (droppedFile) {
       handleFileSelect(droppedFile);
@@ -227,17 +231,17 @@ const CargaMasiva: React.FC<CargaMasivaProps> = ({ onCargaCompleta }) => {
 
   const handleFileSelect = (selectedFile: File) => {
     // Validar tipo de archivo
-    const allowedTypes = ['.csv', '.xlsx', '.xls'];
-    const fileExtension = selectedFile.name.toLowerCase().split('.').pop();
-    
-    if (!allowedTypes.some(type => type.includes(fileExtension || ''))) {
-      setError('Formato de archivo no soportado. Use CSV, Excel (.xlsx, .xls)');
+    const allowedTypes = [".csv", ".xlsx", ".xls"];
+    const fileExtension = selectedFile.name.toLowerCase().split(".").pop();
+
+    if (!allowedTypes.some((type) => type.includes(fileExtension || ""))) {
+      setError("Formato de archivo no soportado. Use CSV, Excel (.xlsx, .xls)");
       return;
     }
 
     // Validar tamaño (máximo 10MB)
     if (selectedFile.size > 10 * 1024 * 1024) {
-      setError('El archivo es demasiado grande. Máximo 10MB permitido.');
+      setError("El archivo es demasiado grande. Máximo 10MB permitido.");
       return;
     }
 
@@ -311,7 +315,9 @@ const CargaMasiva: React.FC<CargaMasivaProps> = ({ onCargaCompleta }) => {
       <div className="mt-6 text-sm text-gray-600 space-y-2">
         <h4 className="font-medium text-gray-800">Instrucciones:</h4>
         <ul className="list-disc list-inside space-y-1">
-          <li>El archivo debe contener las columnas configuradas en el diccionario</li>
+          <li>
+            El archivo debe contener las columnas configuradas en el diccionario
+          </li>
           <li>La primera fila debe contener los nombres de las columnas</li>
           <li>Máximo 50MB de tamaño por archivo</li>
           <li>Se mostrará una previsualización antes de confirmar la carga</li>

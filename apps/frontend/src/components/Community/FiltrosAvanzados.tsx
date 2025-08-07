@@ -1,7 +1,7 @@
-import React from 'react';
-import { FiltroModular } from './FiltroModular';
-import type { DiccionarioColumna } from '@/types/columnas';
-import type { FiltroModular as FiltroModularType } from '@/utils/filterUtils';
+import React from "react";
+import { FiltroModular } from "./FiltroModular";
+import type { DiccionarioColumna } from "@/types/columnas";
+import type { FiltroModular as FiltroModularType } from "@/utils/filterUtils";
 
 interface FiltrosAvanzadosProps {
   show: boolean;
@@ -12,7 +12,7 @@ interface FiltrosAvanzadosProps {
   onUpdateFilter: (filtro: FiltroModularType) => void;
   onRemoveFilter: (id: string) => void;
   onClearAllFilters: () => void;
-  onLogicChange: (id: string, logica: 'AND' | 'OR') => void;
+  onLogicChange: (id: string, logica: "AND" | "OR") => void;
 }
 
 export const FiltrosAvanzados: React.FC<FiltrosAvanzadosProps> = ({
@@ -24,10 +24,15 @@ export const FiltrosAvanzados: React.FC<FiltrosAvanzadosProps> = ({
   onUpdateFilter,
   onRemoveFilter,
   onClearAllFilters,
-  onLogicChange
+  onLogicChange,
 }) => {
   const contarFiltrosActivos = () => {
-    return filtros.filter(f => f.columna && f.operador && (f.valor !== '' || ['es_nulo', 'no_es_nulo'].includes(f.operador))).length;
+    return filtros.filter(
+      (f) =>
+        f.columna &&
+        f.operador &&
+        (f.valor !== "" || ["es_nulo", "no_es_nulo"].includes(f.operador))
+    ).length;
   };
 
   return (
@@ -37,8 +42,8 @@ export const FiltrosAvanzados: React.FC<FiltrosAvanzadosProps> = ({
         onClick={onToggle}
         className={`px-3 py-1 rounded text-sm border transition-colors ${
           show
-            ? 'bg-blue-600 text-white border-blue-600'
-            : 'bg-white text-gray-600 border-gray-300 hover:bg-gray-50'
+            ? "bg-blue-600 text-white border-blue-600"
+            : "bg-white text-gray-600 border-gray-300 hover:bg-gray-50"
         }`}
       >
         Filtros avanzados
@@ -68,7 +73,9 @@ export const FiltrosAvanzados: React.FC<FiltrosAvanzadosProps> = ({
           {filtros.length === 0 ? (
             <div className="text-center py-8 text-gray-500">
               <p className="text-sm">No hay filtros aplicados</p>
-              <p className="text-xs mt-1">Haga clic en "Agregar filtro" para comenzar</p>
+              <p className="text-xs mt-1">
+                Haga clic en "Agregar filtro" para comenzar
+              </p>
             </div>
           ) : (
             <div className="space-y-3">
@@ -91,10 +98,12 @@ export const FiltrosAvanzados: React.FC<FiltrosAvanzadosProps> = ({
             <div className="mt-4 pt-3 border-t border-gray-200">
               <div className="flex items-center justify-between text-xs text-gray-600">
                 <span>
-                  {filtros.length} filtro{filtros.length !== 1 ? 's' : ''} aplicado{filtros.length !== 1 ? 's' : ''}
+                  {filtros.length} filtro{filtros.length !== 1 ? "s" : ""}{" "}
+                  aplicado{filtros.length !== 1 ? "s" : ""}
                   {contarFiltrosActivos() !== filtros.length && (
                     <span className="text-orange-600 ml-1">
-                      ({contarFiltrosActivos()} activo{contarFiltrosActivos() !== 1 ? 's' : ''})
+                      ({contarFiltrosActivos()} activo
+                      {contarFiltrosActivos() !== 1 ? "s" : ""})
                     </span>
                   )}
                 </span>

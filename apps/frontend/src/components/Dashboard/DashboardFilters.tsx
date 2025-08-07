@@ -36,9 +36,7 @@ const DashboardFilters = ({
         ))}
       </select>
       <select
-        onChange={(e) =>
-          setFilters((f) => ({ ...f, tipo: e.target.value }))
-        }
+        onChange={(e) => setFilters((f) => ({ ...f, tipo: e.target.value }))}
         className="w-full p-2 border border-gray-300 rounded-lg"
         value={filters.tipo}
       >
@@ -64,9 +62,7 @@ const DashboardFilters = ({
         ))}
       </select>
       <button
-        onClick={() =>
-          setFilters({ territorio: "", tipo: "", programa: "" })
-        }
+        onClick={() => setFilters({ territorio: "", tipo: "", programa: "" })}
         className="bg-gray-200 text-gray-700 p-2 rounded-lg hover:bg-gray-300"
       >
         Limpiar Filtros

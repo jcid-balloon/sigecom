@@ -11,7 +11,7 @@ interface ErrorStateProps {
 
 export const LoadingState = ({ loading }: LoadingStateProps) => {
   if (!loading) return null;
-  
+
   return (
     <div className="bg-white p-6 rounded-xl shadow-md">
       <div className="animate-pulse space-y-4">
@@ -28,7 +28,7 @@ export const LoadingState = ({ loading }: LoadingStateProps) => {
 
 export const ErrorState = ({ error, onRetry }: ErrorStateProps) => {
   if (!error) return null;
-  
+
   return (
     <div className="bg-white p-6 rounded-xl shadow-md">
       <div className="text-center">
