@@ -7,6 +7,11 @@ import readline from "readline";
 
 dotenv.config();
 
+/**
+ * Script para gestionar administradores del sistema
+ * Permite crear, listar, actualizar y eliminar administradores
+ */
+
 const rl = readline.createInterface({
   input: process.stdin,
   output: process.stdout,

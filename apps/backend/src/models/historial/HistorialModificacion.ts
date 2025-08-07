@@ -3,11 +3,13 @@ import {
   modelOptions,
   prop,
   Ref,
+  index,
 } from "@typegoose/typegoose";
 import { Usuario } from "../Usuario";
 import { PersonaComunidad } from "../PersonaComunidad";
 
 @modelOptions({ options: { allowMixed: 0 } })
+@index({ fechaYHora: 1 }, { expireAfterSeconds: 604800 }) // 7 días en segundos
 export class HistorialModificacion {
   @prop({ ref: () => Usuario, required: true })
   usuario!: Ref<Usuario>;

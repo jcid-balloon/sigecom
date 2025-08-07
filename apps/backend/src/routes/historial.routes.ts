@@ -8,6 +8,8 @@ import {
   getHistorialModificacionById,
   getHistorialCompleto,
   getEstadisticasHistorial,
+  getHistorialCleanupStats,
+  performHistorialCleanup,
 } from "@/controllers/historial.controller";
 import { authenticate, checkRole, ROLES } from "@/middlewares/auth";
 
@@ -42,5 +44,17 @@ export default async function historialRoutes(app: FastifyInstance) {
     "/estadisticas",
     { preHandler: [authenticate] },
     getEstadisticasHistorial
+  );
+
+  // Rutas para gestión de TTL y limpieza
+  app.get(
+    "/cleanup/stats",
+    { preHandler: [authenticate, checkRole([ROLES.ADMIN])] },
+    getHistorialCleanupStats
+  );
+  app.post(
+    "/cleanup",
+    { preHandler: [authenticate, checkRole([ROLES.ADMIN])] },
+    performHistorialCleanup
   );
 }

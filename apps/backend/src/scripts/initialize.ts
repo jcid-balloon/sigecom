@@ -4,9 +4,14 @@ import dotenv from "dotenv";
 import bcrypt from "bcrypt";
 import { UsuarioModel } from "../models/Usuario";
 import { DiccionarioColumnaModel } from "../models/DiccionarioColumna";
+import { setupTTLIndexes } from "./setup-ttl-indexes";
 
 dotenv.config();
 
+/**
+ * Inicializa el sistema creando el usuario administrador y las columnas por defecto
+ * Configura los índices TTL para limpieza automática del historial
+ */
 const initializeSystem = async () => {
   try {
     // Conectar a la base de datos
@@ -109,8 +114,12 @@ const initializeSystem = async () => {
       console.log("✓ Todas las columnas por defecto ya existían");
     }
 
-    // 3. Verificar estado final
-    console.log("3. Verificando estado del sistema...");
+    // 3. Configurar índices TTL para limpieza automática del historial
+    console.log("3. Configurando índices TTL para limpieza automática del historial...");
+    await setupTTLIndexes();
+
+    // 4. Verificar estado final
+    console.log("4. Verificando estado del sistema...");
     const totalUsuarios = await UsuarioModel.countDocuments();
     const totalColumnas = await DiccionarioColumnaModel.countDocuments();
 

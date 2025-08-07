@@ -2,6 +2,7 @@ import { FastifyRequest, FastifyReply } from "fastify";
 import { HistorialCargaModel } from "@/models/historial/HistorialCarga";
 import { HistorialDescargaModel } from "@/models/historial/HistorialDescarga";
 import { HistorialModificacionModel } from "@/models/historial/HistorialModificacion";
+import { HistorialCleanupService } from "@/services/HistorialCleanupService";
 
 //  HISTORIAL DE CARGA 
 
@@ -401,6 +402,63 @@ export const getEstadisticasHistorial = async (
     return reply.code(500).send({
       success: false,
       error: "Error interno del servidor al obtener estadísticas",
+    });
+  }
+};
+
+// GESTIÓN DE TTL Y LIMPIEZA
+
+export const getHistorialCleanupStats = async (
+  req: FastifyRequest,
+  reply: FastifyReply
+) => {
+  try {
+    const stats = await HistorialCleanupService.getHistorialStats();
+    const ttlStatus = await HistorialCleanupService.checkTTLIndexes();
+
+    return reply.send({
+      success: true,
+      data: {
+        statistics: stats,
+        ttlIndexes: ttlStatus,
+      },
+    });
+  } catch (error) {
+    console.error("Error al obtener estadísticas de limpieza:", error);
+    return reply.code(500).send({
+      success: false,
+      error: "Error interno del servidor al obtener estadísticas de limpieza",
+    });
+  }
+};
+
+export const performHistorialCleanup = async (
+  req: FastifyRequest,
+  reply: FastifyReply
+) => {
+  try {
+    const body = req.body as { days?: number };
+    const days = body.days || 7;
+
+    if (days < 1 || days > 365) {
+      return reply.code(400).send({
+        success: false,
+        error: "El número de días debe estar entre 1 y 365",
+      });
+    }
+
+    const result = await HistorialCleanupService.cleanupOlderThan(days);
+
+    return reply.send({
+      success: true,
+      message: `Limpieza completada. Se eliminaron ${result.total} documentos.`,
+      data: result,
+    });
+  } catch (error) {
+    console.error("Error durante la limpieza del historial:", error);
+    return reply.code(500).send({
+      success: false,
+      error: "Error interno del servidor durante la limpieza",
     });
   }
 };

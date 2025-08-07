@@ -35,7 +35,7 @@ npm run build:frontend
 ## Comandos de inicialización Backend
 
 ``` bash
-# Inicializar el backend con un admin y columnas escenciales
+# Inicializar el backend con un admin, columnas escenciales y indice de autoeliminacion para historial
 npm run initialize
 
 # Manejo de usuarios
