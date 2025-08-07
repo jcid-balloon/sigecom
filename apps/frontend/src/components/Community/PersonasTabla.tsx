@@ -47,14 +47,16 @@ export const PersonasTabla: React.FC<PersonasTablaProps> = ({
 
   return (
     <div className="bg-white rounded-xl shadow-md overflow-hidden">
-      <div className="overflow-x-auto">
-        <table className="min-w-full">
-          <thead className="bg-gray-50">
+      {/* Contenedor de tabla con scroll horizontal controlado */}
+      <div className="overflow-x-auto" style={{ maxWidth: '100%' }}>
+        <table className="w-full" style={{ minWidth: 'max-content' }}>
+          <thead className="bg-gray-50 sticky top-0 z-10">
             <tr>
               {columnas.map((columna) => (
                 <th
                   key={columna._id}
-                  className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap"
+                  style={{ minWidth: '200px' }}
                 >
                   {columna.nombre}
                   {columna.requerido && (
@@ -62,7 +64,11 @@ export const PersonasTabla: React.FC<PersonasTablaProps> = ({
                   )}
                 </th>
               ))}
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              {/* Columna de acciones sticky */}
+              <th 
+                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap sticky right-0 bg-gray-50 border-l border-gray-200 shadow-lg z-20"
+                style={{ minWidth: '120px' }}
+              >
                 Acciones
               </th>
             </tr>
@@ -72,7 +78,7 @@ export const PersonasTabla: React.FC<PersonasTablaProps> = ({
               <tr>
                 <td
                   colSpan={columnas.length + 1}
-                  className="px-4 py-8 text-center text-gray-500"
+                  className="px-6 py-8 text-center text-gray-500"
                 >
                   {searchTerm
                     ? "No se encontraron resultados"
@@ -86,37 +92,44 @@ export const PersonasTabla: React.FC<PersonasTablaProps> = ({
                   {columnas.map((columna) => (
                     <td
                       key={columna._id}
-                      className="px-4 py-3 text-sm text-gray-900"
+                      className="px-6 py-4 text-sm text-gray-900"
+                      style={{ minWidth: '200px' }}
                     >
                       {editingId === persona._id ? (
-                        renderCampoInput(
-                          columna,
-                          editingData.datosAdicionales?.[columna.nombre] || "",
-                          (valor) =>
-                            onEditingDataChange({
-                              ...editingData,
-                              datosAdicionales: {
-                                ...editingData.datosAdicionales,
-                                [columna.nombre]: valor,
-                              },
-                            }),
-                          false,
-                          true // modo compacto para la tabla
-                        )
+                        <div className="w-full" style={{ minWidth: '180px' }}>
+                          {renderCampoInput(
+                            columna,
+                            editingData.datosAdicionales?.[columna.nombre] || "",
+                            (valor) =>
+                              onEditingDataChange({
+                                ...editingData,
+                                datosAdicionales: {
+                                  ...editingData.datosAdicionales,
+                                  [columna.nombre]: valor,
+                                },
+                              }),
+                            false,
+                            true // modo compacto para la tabla
+                          )}
+                        </div>
                       ) : (
-                        <span>
+                        <div className="break-words">
                           {mostrarValorCampo(
                             columna,
                             persona.datosAdicionales?.[columna.nombre] || ""
                           )}
-                        </span>
+                        </div>
                       )}
                     </td>
                   ))}
 
-                  <td className="px-4 py-3 text-sm">
+                  {/* Celda de acciones sticky */}
+                  <td 
+                    className="px-6 py-4 text-sm sticky right-0 bg-white border-l border-gray-200 shadow-lg z-20"
+                    style={{ minWidth: '120px' }}
+                  >
                     {editingId === persona._id ? (
-                      <div className="flex space-x-2">
+                      <div className="flex space-x-2 justify-center">
                         <button
                           onClick={onSaveEdit}
                           className="text-green-600 hover:text-green-700"
@@ -133,7 +146,7 @@ export const PersonasTabla: React.FC<PersonasTablaProps> = ({
                         </button>
                       </div>
                     ) : (
-                      <div className="flex space-x-2">
+                      <div className="flex space-x-2 justify-center">
                         <button
                           onClick={() => onStartEdit(persona)}
                           className="text-blue-600 hover:text-blue-700"

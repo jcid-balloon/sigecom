@@ -16,7 +16,7 @@ import { evaluarFiltro } from "@/utils/filterUtils";
 import { generarArchivoLocal } from "@/utils/exportUtils";
 import { ValidacionFrontend } from "@/utils/validacion-frontend";
 
-export const Community = () => {
+const Community = () => {
   // Estados principales
   const [personas, setPersonas] = useState<PersonaComunidad[]>([]);
   const [columnas, setColumnas] = useState<DiccionarioColumna[]>([]);
@@ -393,7 +393,7 @@ export const Community = () => {
 
   try {
     return (
-      <div className="space-y-6">
+      <div className="space-y-6 w-full overflow-hidden">
         {/* Error Alert */}
         {error && (
           <div className="bg-red-50 border border-red-200 rounded-lg p-4">
@@ -465,19 +465,21 @@ export const Community = () => {
           submitButtonText="Crear Persona"
         />
 
-        {/* Tabla de personas */}
-        <PersonasTabla
-          personas={personasFiltradas}
-          columnas={columnas}
-          searchTerm={searchTerm}
-          editingId={editingId}
-          editingData={editingData}
-          onStartEdit={handleStartEdit}
-          onSaveEdit={handleSaveEdit}
-          onCancelEdit={handleCancelEdit}
-          onDelete={handleEliminar}
-          onEditingDataChange={setEditingData}
-        />
+        {/* Tabla de personas - Contenedor con overflow controlado */}
+        <div className="w-full overflow-hidden">
+          <PersonasTabla
+            personas={personasFiltradas}
+            columnas={columnas}
+            searchTerm={searchTerm}
+            editingId={editingId}
+            editingData={editingData}
+            onStartEdit={handleStartEdit}
+            onSaveEdit={handleSaveEdit}
+            onCancelEdit={handleCancelEdit}
+            onDelete={handleEliminar}
+            onEditingDataChange={setEditingData}
+          />
+        </div>
       </div>
     );
   } catch (renderError) {
