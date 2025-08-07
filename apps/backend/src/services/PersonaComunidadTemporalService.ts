@@ -106,12 +106,19 @@ export class PersonaComunidadTemporalService {
 
       // Siempre guardar el valor (incluso si tiene errores para poder corregirlo después)
       const valorString = String(valor).trim();
-      datosAdicionales.set(nombreCampo, valorString);
+      
+      // Aplicar formateo automático si es RUT
+      const valorFormateado = ValidacionService.formatearValorSiEsRut(
+        valorString,
+        columna
+      );
+      
+      datosAdicionales.set(nombreCampo, valorFormateado);
 
-      // Validar el valor
+      // Validar el valor formateado
       try {
         const errorValidacion = ValidacionService.validarTipo(
-          valorString,
+          valorFormateado,
           columna
         );
 

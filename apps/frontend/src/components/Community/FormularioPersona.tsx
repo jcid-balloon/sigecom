@@ -3,6 +3,7 @@ import { CheckCircle } from "lucide-react";
 import type { PersonaComunidad } from "@/services/persona-comunidad.service";
 import type { DiccionarioColumna } from "@/types/columnas";
 import { renderCampoInput } from "@/components/utils/formUtils";
+import { ValidacionFrontend } from "@/utils/validacion-frontend";
 
 interface FormularioPersonaProps {
   show: boolean;
@@ -14,6 +15,8 @@ interface FormularioPersonaProps {
   title?: string;
   submitButtonText?: string;
   isEditing?: boolean;
+  personasExistentes?: PersonaComunidad[];
+  personaIdActual?: string;
 }
 
 export const FormularioPersona: React.FC<FormularioPersonaProps> = ({
@@ -26,21 +29,46 @@ export const FormularioPersona: React.FC<FormularioPersonaProps> = ({
   title = "Nueva Persona",
   submitButtonText = "Crear Persona",
   isEditing = false,
+  personasExistentes = [],
+  personaIdActual,
 }) => {
   if (!show) return null;
+
+  const [validationErrors, setValidationErrors] = React.useState<string[]>([]);
 
   const isFormValid = () => {
     if (columnas.length === 0) return false;
 
     // Verificar campos requeridos
-    return !columnas
+    const camposRequeridosValidos = !columnas
       .filter((col) => col.requerido)
       .some(
         (col) =>
           !persona.datosAdicionales?.[col.nombre] ||
           String(persona.datosAdicionales[col.nombre]).trim() === ""
       );
+
+    return camposRequeridosValidos && validationErrors.length === 0;
   };
+
+  const validateRutUniqueness = React.useCallback(async () => {
+    const errores = await ValidacionFrontend.validarFormularioConUnicidad(
+      persona.datosAdicionales || {},
+      columnas,
+      personasExistentes,
+      personaIdActual
+    );
+
+    const erroresRut = errores
+      .filter(e => e.codigo === "RUT_DUPLICADO")
+      .map(e => e.mensaje);
+
+    setValidationErrors(erroresRut);
+  }, [persona.datosAdicionales, columnas, personasExistentes, personaIdActual]);
+
+  React.useEffect(() => {
+    validateRutUniqueness();
+  }, [validateRutUniqueness]);
 
   const handleFieldChange = (columnName: string, value: any) => {
     onChange({
@@ -97,6 +125,18 @@ export const FormularioPersona: React.FC<FormularioPersonaProps> = ({
             {isEditing ? "editar" : "crear"}
             personas.
           </p>
+        </div>
+      )}
+
+      {/* Mensajes de error de validación */}
+      {validationErrors.length > 0 && (
+        <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+          <h4 className="text-red-800 font-medium mb-2">Errores de validación:</h4>
+          <ul className="list-disc list-inside text-red-700 text-sm">
+            {validationErrors.map((error, index) => (
+              <li key={index}>{error}</li>
+            ))}
+          </ul>
         </div>
       )}
 

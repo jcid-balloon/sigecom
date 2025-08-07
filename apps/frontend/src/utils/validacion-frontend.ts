@@ -3,6 +3,7 @@ import type {
   TipoColumna,
   ValidacionError,
 } from "../types/columnas";
+import { formatearRut, validarRut, pareceRut, limpiarRut } from "./rutUtils";
 
 export class ValidacionFrontend {
   /**
@@ -69,6 +70,42 @@ export class ValidacionFrontend {
       const error = this.validarCampo(valor, columna);
       if (error) {
         errores.push(error);
+      }
+    }
+
+    return errores;
+  }
+
+  /**
+   * Validar formulario con verificación de unicidad de RUT
+   */
+  static async validarFormularioConUnicidad(
+    datos: Record<string, any>,
+    columnas: DiccionarioColumna[],
+    personasExistentes: any[],
+    personaIdActual?: string
+  ): Promise<ValidacionError[]> {
+    // Primero hacer validación básica
+    const errores = this.validarFormulario(datos, columnas);
+
+    // Verificar unicidad de RUT si existe
+    const rutColumna = columnas.find(col => this.debeFormatearRut(col));
+    if (rutColumna && datos[rutColumna.nombre]) {
+      const rutIngresado = datos[rutColumna.nombre];
+      
+      // Buscar si ya existe ese RUT en otras personas
+      const rutDuplicado = personasExistentes.find(persona => {
+        const rutExistente = persona.datosAdicionales?.[rutColumna.nombre];
+        return rutExistente === rutIngresado && persona._id !== personaIdActual;
+      });
+
+      if (rutDuplicado) {
+        errores.push({
+          campo: rutColumna.nombre,
+          valor: rutIngresado,
+          mensaje: `Ya existe una persona con el RUT: ${rutIngresado}`,
+          codigo: "RUT_DUPLICADO",
+        });
       }
     }
 
@@ -214,6 +251,71 @@ export class ValidacionFrontend {
         return new Date(valor).toISOString().split("T")[0]; // Formato YYYY-MM-DD
       default:
         return String(valor);
+    }
+  }
+
+  /**
+   * Formatear RUT automáticamente
+   */
+  static formatearRut(valor: string): string {
+    return formatearRut(valor);
+  }
+
+  /**
+   * Determinar si un campo debe formatear RUT automáticamente
+   */
+  static debeFormatearRut(columna: DiccionarioColumna): boolean {
+    // Verificar si la columna tiene validación de RUT
+    if (columna.tipoValidacion === "regex" && columna.validacion) {
+      // Buscar patrones comunes de RUT en el regex
+      const rutPatterns = [
+        /rut/i,
+        /\d+\.\d+\.\d+-[\dkK]/,
+        /^\d{7,8}-[\dkK]$/,
+        /^\d{1,2}\.\d{3}\.\d{3}-[\dkK]$/
+      ];
+      
+      return rutPatterns.some(pattern => 
+        pattern.test(columna.validacion!) || 
+        pattern.test(columna.nombre) ||
+        pattern.test(columna.descripcion || '')
+      );
+    }
+    
+    // También verificar por nombre de columna
+    return /rut/i.test(columna.nombre);
+  }
+
+  /**
+   * Formatear valor para preview/visualización
+   */
+  static formatearValorParaPreview(
+    valor: any, 
+    columna: DiccionarioColumna
+  ): string {
+    if (valor === null || valor === undefined || valor === "") {
+      return "";
+    }
+
+    const valorStr = String(valor);
+
+    // Formatear RUT si aplica
+    if (this.debeFormatearRut(columna) && pareceRut(valorStr)) {
+      return formatearRut(valorStr);
+    }
+
+    // Formateo estándar por tipo
+    switch (columna.tipo) {
+      case "boolean":
+        return valorStr === "true" ? "Sí" : valorStr === "false" ? "No" : valorStr;
+      case "date":
+        try {
+          return new Date(valorStr).toLocaleDateString();
+        } catch {
+          return valorStr;
+        }
+      default:
+        return valorStr;
     }
   }
 

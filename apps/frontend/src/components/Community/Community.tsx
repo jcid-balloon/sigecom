@@ -497,6 +497,7 @@ const Community = () => {
           onChange={setNewPersona}
           title="Nueva Persona"
           submitButtonText="Crear Persona"
+          personasExistentes={personas}
         />
 
         {/* Tabla de personas - Contenedor con overflow controlado */}

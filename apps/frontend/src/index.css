@@ -1,1 +1,96 @@
 @import "tailwindcss";
+
+/* Estilos personalizados para tablas */
+.table-container {
+  /* Scrollbar personalizado para tablas */
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 #f1f5f9;
+}
+
+.table-container::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.table-container::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 4px;
+}
+
+.table-container::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+
+.table-container::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Animaciones para fullscreen */
+.fullscreen-enter {
+  animation: expandToFullscreen 0.3s ease-out;
+}
+
+.fullscreen-exit {
+  animation: contractFromFullscreen 0.3s ease-out;
+}
+
+@keyframes expandToFullscreen {
+  from {
+    transform: scale(0.95);
+    opacity: 0.8;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes contractFromFullscreen {
+  from {
+    transform: scale(1.05);
+    opacity: 1;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* Estilos para headers sticky mejorados */
+.sticky-header {
+  backdrop-filter: blur(8px);
+  background: rgba(249, 250, 251, 0.95);
+}
+
+.sticky-actions {
+  backdrop-filter: blur(8px);
+  background: rgba(255, 255, 255, 0.95);
+}
+
+/* Hover effects mejorados */
+.table-row-hover:hover {
+  background-color: rgba(59, 130, 246, 0.05);
+  transition: background-color 0.15s ease-in-out;
+}
+
+/* Estados de registro en preview */
+.estado-nuevo {
+  border-left: 4px solid #10b981;
+  background: linear-gradient(to right, rgba(16, 185, 129, 0.05), transparent);
+}
+
+.estado-actualizar {
+  border-left: 4px solid #3b82f6;
+  background: linear-gradient(to right, rgba(59, 130, 246, 0.05), transparent);
+}
+
+.estado-error {
+  border-left: 4px solid #ef4444;
+  background: linear-gradient(to right, rgba(239, 68, 68, 0.05), transparent);
+}
+
+.estado-sin-cambios {
+  border-left: 4px solid #6b7280;
+  background: linear-gradient(to right, rgba(107, 114, 128, 0.05), transparent);
+}

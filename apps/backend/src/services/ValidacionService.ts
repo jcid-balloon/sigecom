@@ -3,6 +3,7 @@ import {
   DiccionarioColumna,
   TipoColumna,
 } from "@/models/DiccionarioColumna";
+import { formatearRut, validarRut, pareceRut, limpiarRut } from "@/utils/rutUtils";
 
 export interface ValidacionError {
   campo: string;
@@ -109,7 +110,13 @@ export class ValidacionService {
         continue;
       }
 
-      datosLimpios[campo] = valorLimpio;
+      // Aplicar formateo automático si es RUT
+      const valorFinalFormateado = this.formatearValorSiEsRut(
+        String(valorLimpio), 
+        columna
+      );
+
+      datosLimpios[campo] = valorFinalFormateado;
     }
 
     // Validar campos requeridos que no están en los datos
@@ -308,5 +315,83 @@ export class ValidacionService {
       patron: col.patron,
       placeholder: col.placeholder,
     }));
+  }
+
+  /**
+   * Determinar si un campo debe formatear RUT automáticamente
+   */
+  static debeFormatearRut(columna: DiccionarioColumna): boolean {
+    // Verificar si la columna tiene validación de RUT
+    if (columna.tipoValidacion === "regex" && columna.validacion) {
+      // Buscar patrones comunes de RUT en el regex
+      const rutPatterns = [
+        /rut/i,
+        /\d+\.\d+\.\d+-[\dkK]/,
+        /^\d{7,8}-[\dkK]$/,
+        /^\d{1,2}\.\d{3}\.\d{3}-[\dkK]$/
+      ];
+      
+      return rutPatterns.some(pattern => 
+        pattern.test(columna.validacion!) || 
+        pattern.test(columna.nombre) ||
+        pattern.test(columna.descripcion || '')
+      );
+    }
+    
+    // También verificar por nombre de columna
+    return /rut/i.test(columna.nombre);
+  }
+
+  /**
+   * Formatear valor automáticamente si es RUT
+   */
+  static formatearValorSiEsRut(
+    valor: string, 
+    columna: DiccionarioColumna
+  ): string {
+    if (!valor || typeof valor !== 'string') {
+      return valor;
+    }
+
+    // Verificar si debe formatear RUT
+    if (this.debeFormatearRut(columna) && pareceRut(valor)) {
+      return formatearRut(valor);
+    }
+
+    return valor;
+  }
+
+  /**
+   * Procesar y formatear datos durante el preview
+   */
+  static async procesarDatosParaPreview(
+    datos: Record<string, any>
+  ): Promise<Record<string, any>> {
+    const columnas = await DiccionarioColumnaModel.find({});
+    const datosFormateados: Record<string, any> = {};
+
+    // Crear un mapa de columnas por nombre para acceso rápido
+    const mapaColumnas = new Map<string, DiccionarioColumna>();
+    columnas.forEach((col) => {
+      mapaColumnas.set(col.nombre.toLowerCase(), col);
+    });
+
+    // Procesar cada campo
+    for (const [campo, valor] of Object.entries(datos)) {
+      const campoNormalizado = campo.toLowerCase();
+      const columna = mapaColumnas.get(campoNormalizado);
+
+      if (columna && valor) {
+        // Aplicar formateo automático si corresponde
+        datosFormateados[campo] = this.formatearValorSiEsRut(
+          String(valor).trim(), 
+          columna
+        );
+      } else {
+        datosFormateados[campo] = valor;
+      }
+    }
+
+    return datosFormateados;
   }
 }

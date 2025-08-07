@@ -54,11 +54,23 @@ export class PersonaComunidadService {
         // 2. Usar los datos limpios de la validación
         const datosLimpios = { datosAdicionales: validacion.datosLimpios };
 
-        // 3. Crear la persona con datos validados
+        // 3. Verificar unicidad de RUT si existe
+        if (datosLimpios.datosAdicionales.rut) {
+          const rutFormateado = datosLimpios.datosAdicionales.rut;
+          const personaConMismoRut = await PersonaComunidadModel.findOne({
+            "datosAdicionales.rut": rutFormateado,
+          }).session(session);
+
+          if (personaConMismoRut) {
+            throw new Error(`Ya existe una persona con el RUT: ${rutFormateado}`);
+          }
+        }
+
+        // 4. Crear la persona con datos validados
         const persona = new PersonaComunidadModel(datosLimpios);
         const personaGuardada = await persona.save({ session });
 
-        // 4. Crear historial de modificación
+        // 5. Crear historial de modificación
         const contextoOperacion = HistorialService.generarContextoOperacion(
           datosLimpios.datosAdicionales
         );
@@ -100,9 +112,24 @@ export class PersonaComunidadService {
           throw new Error("Persona no encontrada");
         }
 
+        // 1.5. Validar y formatear datos nuevos si hay datosAdicionales
+        let datosValidados = updates.datosAdicionales;
+        if (updates.datosAdicionales) {
+          const validacion = await ValidacionService.validarDatos(
+            updates.datosAdicionales
+          );
+          if (!validacion.valido) {
+            const erroresTexto = validacion.errores
+              .map((e) => `${e.campo}: ${e.mensaje}`)
+              .join("; ");
+            throw new Error(`Errores de validación: ${erroresTexto}`);
+          }
+          datosValidados = validacion.datosLimpios;
+        }
+
         // 2. Verificar si se está cambiando el RUT y si ya existe
-        if (updates.datosAdicionales?.rut) {
-          const nuevoRut = updates.datosAdicionales.rut;
+        if (datosValidados?.rut) {
+          const nuevoRut = datosValidados.rut;
           const rutOriginal = personaOriginal.datosAdicionales?.rut;
 
           // Solo verificar si el RUT realmente cambió
@@ -126,7 +153,7 @@ export class PersonaComunidadService {
           });
 
         // 4. Crear historiales para cada campo modificado en datosAdicionales
-        if (updates.datosAdicionales) {
+        if (datosValidados) {
           const cambios: Array<{
             documentoId: string;
             campo: string;
@@ -136,7 +163,7 @@ export class PersonaComunidadService {
 
           const datosOriginales = personaOriginal.datosAdicionales || {};
 
-          Object.entries(updates.datosAdicionales).forEach(
+          Object.entries(datosValidados).forEach(
             ([campo, valorNuevo]) => {
               const valorOriginal = datosOriginales[campo] || "";
 
@@ -162,9 +189,9 @@ export class PersonaComunidadService {
 
         // 5. Preparar los datos para actualizar
         const updateData: any = {};
-        if (updates.datosAdicionales) {
-          // Los datos ya vienen como Record, no necesitamos convertir
-          updateData.datosAdicionales = updates.datosAdicionales;
+        if (datosValidados) {
+          // Usar los datos validados y formateados
+          updateData.datosAdicionales = datosValidados;
         }
 
         // 6. Actualizar el registro

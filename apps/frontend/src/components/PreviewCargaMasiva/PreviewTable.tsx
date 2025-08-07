@@ -9,6 +9,7 @@ import {
   Check,
   X,
   Info,
+  Maximize2,
 } from "lucide-react";
 import type {
   PersonaComunidadTemporal,
@@ -17,6 +18,8 @@ import type {
 import type { DiccionarioColumna } from "@/types/columnas";
 import { FieldEditor } from "./FieldEditor";
 import InfoModal from "@/components/utils/InfoModal";
+import { useFullscreen } from "@/hooks/useFullscreen";
+import { FullscreenToolbar } from "@/components/utils/FullscreenToolbar";
 
 interface PreviewTableProps {
   registros: PersonaComunidadTemporal[];
@@ -41,6 +44,7 @@ export const PreviewTable = ({
   onCancelEdit,
   onDeleteRecord,
 }: PreviewTableProps) => {
+  const { isFullscreen, toggleFullscreen } = useFullscreen();
   const [infoModal, setInfoModal] = useState<{
     isOpen: boolean;
     title: string;
@@ -73,16 +77,24 @@ export const PreviewTable = ({
   const handleInfoMouseLeave = () => {
     setInfoModal((prev) => ({ ...prev, isOpen: false }));
   };
+
+  // Ordenar registros: errores primero, luego por número de fila
+  const registrosOrdenados = [...registros].sort((a, b) => {
+    if (a.estado === "error" && b.estado !== "error") return -1;
+    if (a.estado !== "error" && b.estado === "error") return 1;
+    return (a.numeroFila || 0) - (b.numeroFila || 0);
+  });
+
   const obtenerClaseEstado = (estado: EstadoPreviewPersona) => {
     switch (estado) {
       case "nuevo":
-        return "bg-green-50 border-l-4 border-green-400";
+        return "estado-nuevo";
       case "actualizar":
-        return "bg-blue-50 border-l-4 border-blue-400";
+        return "estado-actualizar";
       case "error":
-        return "bg-red-50 border-l-4 border-red-400";
+        return "estado-error";
       case "sin_cambios":
-        return "bg-gray-50 border-l-4 border-gray-400";
+        return "estado-sin-cambios";
       default:
         return "bg-white";
     }
@@ -173,13 +185,6 @@ export const PreviewTable = ({
     );
   };
 
-  // Ordenar registros: errores primero, luego por número de fila
-  const registrosOrdenados = [...registros].sort((a, b) => {
-    if (a.estado === "error" && b.estado !== "error") return -1;
-    if (a.estado !== "error" && b.estado === "error") return 1;
-    return (a.numeroFila || 0) - (b.numeroFila || 0);
-  });
-
   if (registros.length === 0) {
     return (
       <div className="bg-white p-6 rounded-xl shadow-md text-center">
@@ -189,11 +194,85 @@ export const PreviewTable = ({
   }
 
   return (
-    <div className="bg-white rounded-xl shadow-md overflow-hidden">
-      {/* Contenedor de tabla con scroll horizontal controlado */}
-      <div className="overflow-x-auto" style={{ maxWidth: "100%" }}>
+    <>
+      {/* Barra de herramientas fullscreen */}
+      {isFullscreen && (
+        <FullscreenToolbar
+          title="Vista Previa de Carga"
+          onClose={toggleFullscreen}
+        >
+          <div className="flex space-x-4 text-sm">
+            <span className="flex items-center text-green-300">
+              <UserPlus className="h-4 w-4 mr-1" />
+              {registros.filter(r => r.estado === 'nuevo').length} nuevos
+            </span>
+            <span className="flex items-center text-blue-300">
+              <RefreshCw className="h-4 w-4 mr-1" />
+              {registros.filter(r => r.estado === 'actualizar').length} actualizar
+            </span>
+            <span className="flex items-center text-red-300">
+              <AlertTriangle className="h-4 w-4 mr-1" />
+              {registros.filter(r => r.estado === 'error').length} errores
+            </span>
+          </div>
+        </FullscreenToolbar>
+      )}
+
+      <div 
+        className={`bg-white rounded-xl shadow-md overflow-hidden ${
+          isFullscreen 
+            ? 'fixed inset-0 z-40 rounded-none pt-16' 
+            : 'relative'
+        }`}
+      >
+        {/* Header con estadísticas y botón de fullscreen - solo visible cuando no está en fullscreen */}
+        {!isFullscreen && (
+          <div className="bg-gray-50 border-b border-gray-200 px-6 py-3 flex justify-between items-center">
+            <div>
+              <h3 className="text-lg font-medium text-gray-800">
+                Vista Previa de Carga ({registros.length} registros)
+              </h3>
+              <div className="flex space-x-4 text-sm text-gray-600 mt-1">
+                <span className="flex items-center">
+                  <UserPlus className="h-4 w-4 text-green-600 mr-1" />
+                  Nuevos: {registros.filter(r => r.estado === 'nuevo').length}
+                </span>
+                <span className="flex items-center">
+                  <RefreshCw className="h-4 w-4 text-blue-600 mr-1" />
+                  Actualizar: {registros.filter(r => r.estado === 'actualizar').length}
+                </span>
+                <span className="flex items-center">
+                  <AlertTriangle className="h-4 w-4 text-red-600 mr-1" />
+                  Errores: {registros.filter(r => r.estado === 'error').length}
+                </span>
+              </div>
+            </div>
+            <div className="flex items-center space-x-3">
+              <span className="text-sm text-gray-500 hidden sm:block">
+                Vista expandida
+              </span>
+              <button
+                onClick={toggleFullscreen}
+                className="flex items-center space-x-2 px-4 py-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-200 border border-gray-300 hover:border-blue-300 shadow-sm hover:shadow-md"
+                title="🔍 Abrir en pantalla completa para mejor visualización"
+              >
+                <Maximize2 className="h-4 w-4" />
+                <span className="text-sm font-medium hidden sm:inline">Pantalla Completa</span>
+              </button>
+            </div>
+          </div>
+        )}
+
+      {/* Contenedor de tabla con altura fija y scroll */}
+      <div 
+        className="table-container overflow-auto" 
+        style={{ 
+          maxWidth: "100%",
+          height: isFullscreen ? 'calc(100vh - 120px)' : '60vh'
+        }}
+      >
         <table className="w-full" style={{ minWidth: "max-content" }}>
-          <thead className="bg-gray-50 sticky top-0 z-10">
+          <thead className="sticky-header sticky top-0 z-10">
             <tr>
               <th
                 className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap"
@@ -236,7 +315,7 @@ export const PreviewTable = ({
               ))}
               {/* Columna de acciones sticky */}
               <th
-                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap sticky right-0 bg-gray-50 border-l border-gray-200 shadow-lg z-20"
+                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap sticky right-0 sticky-header border-l border-gray-200 shadow-lg z-20"
                 style={{ minWidth: "120px" }}
               >
                 Acciones
@@ -249,7 +328,7 @@ export const PreviewTable = ({
                 key={registro._id}
                 className={`${obtenerClaseEstado(
                   registro.estado
-                )} hover:bg-opacity-75`}
+                )} table-row-hover`}
               >
                 {/* Estado */}
                 <td
@@ -329,7 +408,7 @@ export const PreviewTable = ({
 
                 {/* Celda de acciones sticky */}
                 <td
-                  className="px-6 py-4 text-sm sticky right-0 bg-white border-l border-gray-200 shadow-lg z-20"
+                  className="px-6 py-4 text-sm sticky right-0 sticky-actions border-l border-gray-200 shadow-lg z-20"
                   style={{ minWidth: "120px" }}
                 >
                   <div
@@ -385,6 +464,7 @@ export const PreviewTable = ({
         </table>
       </div>
 
+      {/* Modal de información */}
       <InfoModal
         isOpen={infoModal.isOpen}
         onClose={() => setInfoModal((prev) => ({ ...prev, isOpen: false }))}
@@ -393,6 +473,7 @@ export const PreviewTable = ({
         tooltipMode={infoModal.tooltipMode}
         mousePosition={infoModal.mousePosition}
       />
-    </div>
+      </div>
+    </>
   );
 };

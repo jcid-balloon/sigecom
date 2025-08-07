@@ -1,4 +1,53 @@
+import React, { useRef } from "react";
 import type { DiccionarioColumna } from "@/types/columnas";
+import { ValidacionFrontend } from "@/utils/validacion-frontend";
+import { formatearRutEnInput } from "@/utils/rutUtils";
+
+// Componente RutInput separado para evitar re-creación
+const RutInput: React.FC<{
+  value: string;
+  onChange: (value: string) => void;
+  disabled?: boolean;
+  className: string;
+  placeholder?: string;
+  maxLength?: number;
+  title?: string;
+}> = ({ value, onChange, disabled, className, placeholder, maxLength, title }) => {
+  const inputRef = useRef<HTMLInputElement>(null);
+  
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const input = e.target;
+    const nuevoValor = input.value;
+    const posicionCursor = input.selectionStart || 0;
+    
+    // Formatear el RUT
+    const { valorFormateado, nuevaPosicion } = formatearRutEnInput(nuevoValor, posicionCursor);
+    
+    // Actualizar el valor
+    onChange(valorFormateado);
+    
+    // Programar la restauración del cursor
+    setTimeout(() => {
+      if (input && document.activeElement === input) {
+        input.setSelectionRange(nuevaPosicion, nuevaPosicion);
+      }
+    }, 0);
+  };
+  
+  return (
+    <input
+      ref={inputRef}
+      type="text"
+      value={value || ""}
+      onChange={handleChange}
+      disabled={disabled}
+      className={className}
+      placeholder={placeholder}
+      maxLength={maxLength}
+      title={title}
+    />
+  );
+};
 
 /**
  * Renderiza un campo de entrada según el tipo de columna
@@ -114,6 +163,27 @@ export const renderCampoInput = (
       );
 
     default: // string, phone, url, etc.
+      // Verificar si es un campo RUT para aplicar formateo automático
+      const esRUT = ValidacionFrontend.debeFormatearRut(columna);
+      
+      if (esRUT) {
+        return (
+          <RutInput
+            value={valor}
+            onChange={onChange}
+            disabled={disabled}
+            className={baseClassName}
+            placeholder={
+              columna.placeholder ||
+              columna.valorPorDefecto ||
+              "Ej: 12.345.678-9"
+            }
+            maxLength={12} // Formato completo: XX.XXX.XXX-X
+            title="RUT chileno (se formatea automáticamente)"
+          />
+        );
+      }
+      
       return (
         <input
           type="text"
@@ -149,16 +219,6 @@ export const mostrarValorCampo = (
 ) => {
   if (!valor) return "-";
 
-  switch (columna.tipo) {
-    case "boolean":
-      return valor === "true" ? "Sí" : valor === "false" ? "No" : valor;
-    case "date":
-      try {
-        return new Date(valor).toLocaleDateString();
-      } catch {
-        return valor;
-      }
-    default:
-      return valor;
-  }
+  // Usar el formateo de preview que incluye RUT
+  return ValidacionFrontend.formatearValorParaPreview(valor, columna);
 };
