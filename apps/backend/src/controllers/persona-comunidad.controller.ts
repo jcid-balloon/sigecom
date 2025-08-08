@@ -1,8 +1,6 @@
 import { FastifyRequest, FastifyReply } from "fastify";
 import { MultipartFile } from "@fastify/multipart";
 import { PersonaComunidadService } from "@/services/PersonaComunidadService";
-import path from "path";
-import fs from "fs";
 
 // Crear nueva persona
 const crear = async (req: FastifyRequest, reply: FastifyReply) => {
@@ -243,6 +241,31 @@ const registrarDescarga = async (req: FastifyRequest, reply: FastifyReply) => {
   }
 };
 
+// Limpiar columnas obsoletas
+const limpiarColumnasObsoletas = async (
+  req: FastifyRequest,
+  reply: FastifyReply
+) => {
+  try {
+    const userId = (req.user as { id: string }).id;
+
+    const resultado = await PersonaComunidadService.limpiarColumnasObsoletas(
+      userId
+    );
+
+    return reply.send({
+      success: true,
+      message: "Limpieza de columnas obsoletas completada",
+      data: resultado,
+    });
+  } catch (err: any) {
+    return reply.code(500).send({
+      error: "Error al limpiar columnas obsoletas",
+      detail: err.message,
+    });
+  }
+};
+
 // Exportar como objeto
 export const personaComunidadController = {
   crear,
@@ -254,4 +277,5 @@ export const personaComunidadController = {
   cargarCSV,
   obtenerEstadoTrabajo,
   registrarDescarga,
+  limpiarColumnasObsoletas,
 };

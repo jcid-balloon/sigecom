@@ -53,4 +53,10 @@ export default async function personaComunidadConHistorialRoutes(
     preHandler: [authenticate],
     handler: personaComunidadController.registrarDescarga,
   });
+
+  // Limpiar columnas obsoletas
+  fastify.post("/limpiar-columnas-obsoletas", {
+    preHandler: [authenticate],
+    handler: personaComunidadController.limpiarColumnasObsoletas,
+  });
 }

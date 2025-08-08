@@ -3,7 +3,12 @@ import {
   DiccionarioColumna,
   TipoColumna,
 } from "@/models/DiccionarioColumna";
-import { formatearRut, validarRut, pareceRut, limpiarRut } from "@/utils/rutUtils";
+import {
+  formatearRut,
+  validarRut,
+  pareceRut,
+  limpiarRut,
+} from "@/utils/rutUtils";
 
 export interface ValidacionError {
   campo: string;
@@ -41,13 +46,8 @@ export class ValidacionService {
       const columna = mapaColumnas.get(campoNormalizado);
 
       if (!columna) {
-        // Campo no está definido en el diccionario
-        errores.push({
-          campo,
-          valor,
-          mensaje: `El campo '${campo}' no está definido en el diccionario de columnas`,
-          codigo: "CAMPO_NO_DEFINIDO",
-        });
+        // Campo no está definido en el diccionario - simplemente lo omitimos
+        // console.log(`Campo '${campo}' no encontrado en diccionario, omitiendo...`);
         continue;
       }
 
@@ -112,7 +112,7 @@ export class ValidacionService {
 
       // Aplicar formateo automático si es RUT
       const valorFinalFormateado = this.formatearValorSiEsRut(
-        String(valorLimpio), 
+        String(valorLimpio),
         columna
       );
 
@@ -263,9 +263,36 @@ export class ValidacionService {
     try {
       switch (columna.tipoValidacion) {
         case "lista":
-          const lista = JSON.parse(columna.validacion);
-          if (!Array.isArray(lista) || !lista.includes(valor)) {
-            return `El valor debe ser uno de: ${lista.join(", ")}`;
+          // Manejar tanto JSON como valores separados por comas
+          let opciones: string[] = [];
+          try {
+            // Intentar parsear como JSON primero
+            const parsed = JSON.parse(columna.validacion);
+            if (Array.isArray(parsed)) {
+              opciones = parsed.map((o) => String(o).trim());
+            } else {
+              throw new Error("No es array");
+            }
+          } catch {
+            // Si falla, tratar como valores separados por comas
+            opciones = columna.validacion
+              .split(",")
+              .map((o) => o.trim())
+              .filter((o) => o.length > 0);
+          }
+
+          if (opciones.length === 0) {
+            return `Configuración de lista inválida`;
+          }
+
+          // Comparar el valor (normalizando a string y eliminando espacios)
+          const valorNormalizado = String(valor).trim();
+          const valorValido = opciones.some(
+            (opcion) => opcion.toLowerCase() === valorNormalizado.toLowerCase()
+          );
+
+          if (!valorValido) {
+            return `El valor debe ser uno de: ${opciones.join(", ")}`;
           }
           break;
 
@@ -328,16 +355,17 @@ export class ValidacionService {
         /rut/i,
         /\d+\.\d+\.\d+-[\dkK]/,
         /^\d{7,8}-[\dkK]$/,
-        /^\d{1,2}\.\d{3}\.\d{3}-[\dkK]$/
+        /^\d{1,2}\.\d{3}\.\d{3}-[\dkK]$/,
       ];
-      
-      return rutPatterns.some(pattern => 
-        pattern.test(columna.validacion!) || 
-        pattern.test(columna.nombre) ||
-        pattern.test(columna.descripcion || '')
+
+      return rutPatterns.some(
+        (pattern) =>
+          pattern.test(columna.validacion!) ||
+          pattern.test(columna.nombre) ||
+          pattern.test(columna.descripcion || "")
       );
     }
-    
+
     // También verificar por nombre de columna
     return /rut/i.test(columna.nombre);
   }
@@ -346,10 +374,10 @@ export class ValidacionService {
    * Formatear valor automáticamente si es RUT
    */
   static formatearValorSiEsRut(
-    valor: string, 
+    valor: string,
     columna: DiccionarioColumna
   ): string {
-    if (!valor || typeof valor !== 'string') {
+    if (!valor || typeof valor !== "string") {
       return valor;
     }
 
@@ -384,7 +412,7 @@ export class ValidacionService {
       if (columna && valor) {
         // Aplicar formateo automático si corresponde
         datosFormateados[campo] = this.formatearValorSiEsRut(
-          String(valor).trim(), 
+          String(valor).trim(),
           columna
         );
       } else {

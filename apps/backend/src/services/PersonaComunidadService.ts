@@ -62,7 +62,9 @@ export class PersonaComunidadService {
           }).session(session);
 
           if (personaConMismoRut) {
-            throw new Error(`Ya existe una persona con el RUT: ${rutFormateado}`);
+            throw new Error(
+              `Ya existe una persona con el RUT: ${rutFormateado}`
+            );
           }
         }
 
@@ -163,20 +165,18 @@ export class PersonaComunidadService {
 
           const datosOriginales = personaOriginal.datosAdicionales || {};
 
-          Object.entries(datosValidados).forEach(
-            ([campo, valorNuevo]) => {
-              const valorOriginal = datosOriginales[campo] || "";
+          Object.entries(datosValidados).forEach(([campo, valorNuevo]) => {
+            const valorOriginal = datosOriginales[campo] || "";
 
-              if (valorOriginal !== valorNuevo) {
-                cambios.push({
-                  documentoId: personaId,
-                  campo,
-                  valorAnterior: valorOriginal,
-                  valorNuevo: valorNuevo || "",
-                });
-              }
+            if (valorOriginal !== valorNuevo) {
+              cambios.push({
+                documentoId: personaId,
+                campo,
+                valorAnterior: valorOriginal,
+                valorNuevo: valorNuevo || "",
+              });
             }
-          );
+          });
 
           if (cambios.length > 0) {
             await HistorialService.crearHistorialesModificacionMultiples(
@@ -716,5 +716,96 @@ export class PersonaComunidadService {
       errores: job.errores,
       historialCargaId: job.historialCargaId,
     };
+  }
+
+  /**
+   * Limpiar columnas obsoletas de todas las personas comunidad
+   * Elimina columnas que existen en los datos pero no en el diccionario actual
+   */
+  static async limpiarColumnasObsoletas(userId: string) {
+    const session = await mongoose.startSession();
+
+    try {
+      return await session.withTransaction(async () => {
+        // 1. Obtener todas las columnas válidas actuales
+        const { DiccionarioColumnaModel } = await import(
+          "@/models/DiccionarioColumna"
+        );
+        const columnasValidas = await DiccionarioColumnaModel.find({}).session(
+          session
+        );
+        const nombresColumnasValidas = new Set(
+          columnasValidas.map((col) => col.nombre.toLowerCase())
+        );
+
+        // 2. Obtener todas las personas
+        const personas = await PersonaComunidadModel.find({}).session(session);
+
+        let personasActualizadas = 0;
+        let columnasEliminadas: string[] = [];
+
+        // 3. Procesar cada persona
+        for (const persona of personas) {
+          if (!persona.datosAdicionales) continue;
+
+          const datosOriginales = { ...persona.datosAdicionales };
+          const datosLimpios: Record<string, any> = {};
+          let hayColumnasObsoletas = false;
+
+          // 4. Filtrar solo las columnas que existen en el diccionario
+          for (const [campo, valor] of Object.entries(datosOriginales)) {
+            const campoNormalizado = campo.toLowerCase();
+
+            if (nombresColumnasValidas.has(campoNormalizado)) {
+              // Mantener la columna
+              datosLimpios[campo] = valor;
+            } else {
+              // Columna obsoleta - la eliminamos
+              hayColumnasObsoletas = true;
+              if (!columnasEliminadas.includes(campo)) {
+                columnasEliminadas.push(campo);
+              }
+            }
+          }
+
+          // 5. Actualizar la persona si había columnas obsoletas
+          if (hayColumnasObsoletas) {
+            await PersonaComunidadModel.findByIdAndUpdate(
+              persona._id,
+              { datosAdicionales: datosLimpios },
+              { session }
+            );
+            personasActualizadas++;
+
+            // 6. Crear historial de la limpieza
+            const contextoOperacion =
+              HistorialService.generarContextoOperacion(datosLimpios);
+            await HistorialService.crearHistorialModificacionIndividual(
+              userId,
+              persona._id.toString(),
+              "modificacion",
+              `Eliminadas columnas obsoletas: ${Object.keys(datosOriginales)
+                .filter(
+                  (campo) => !nombresColumnasValidas.has(campo.toLowerCase())
+                )
+                .join(", ")}`,
+              undefined,
+              contextoOperacion,
+              session
+            );
+          }
+        }
+
+        return {
+          personasActualizadas,
+          columnasEliminadas,
+          mensaje: `Se actualizaron ${personasActualizadas} personas. Columnas eliminadas: ${columnasEliminadas.join(
+            ", "
+          )}`,
+        };
+      });
+    } finally {
+      await session.endSession();
+    }
   }
 }

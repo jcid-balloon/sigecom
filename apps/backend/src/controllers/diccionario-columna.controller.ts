@@ -8,13 +8,11 @@ export const getColumnas = async (req: FastifyRequest, reply: FastifyReply) => {
     const columnas = await DiccionarioColumnaModel.find({});
     return reply.send({ success: true, data: columnas });
   } catch (err) {
-    return reply
-      .code(500)
-      .send({
-        success: false,
-        error: "Error al obtener columnas",
-        detail: err,
-      });
+    return reply.code(500).send({
+      success: false,
+      error: "Error al obtener columnas",
+      detail: err,
+    });
   }
 };
 
@@ -26,13 +24,11 @@ export const getColumnasParaFrontend = async (
     const columnas = await ValidacionService.obtenerColumnasParaFrontend();
     return reply.send({ success: true, data: columnas });
   } catch (err) {
-    return reply
-      .code(500)
-      .send({
-        success: false,
-        error: "Error al obtener columnas para frontend",
-        detail: err,
-      });
+    return reply.code(500).send({
+      success: false,
+      error: "Error al obtener columnas para frontend",
+      detail: err,
+    });
   }
 };
 
@@ -84,12 +80,10 @@ export const createColumna = async (
       nombre: nombreNormalizado,
     });
     if (existingColumna) {
-      return reply
-        .code(400)
-        .send({
-          success: false,
-          error: "Ya existe una columna con ese nombre",
-        });
+      return reply.code(400).send({
+        success: false,
+        error: "Ya existe una columna con ese nombre",
+      });
     }
 
     const columna = new DiccionarioColumnaModel({
@@ -151,12 +145,10 @@ export const updateColumna = async (
       });
 
       if (existingColumna) {
-        return reply
-          .code(400)
-          .send({
-            success: false,
-            error: "Ya existe otra columna con ese nombre",
-          });
+        return reply.code(400).send({
+          success: false,
+          error: "Ya existe otra columna con ese nombre",
+        });
       }
     }
 
@@ -215,13 +207,11 @@ export const updateColumna = async (
 
     return reply.send({ success: true, data: columna });
   } catch (err) {
-    return reply
-      .code(400)
-      .send({
-        success: false,
-        error: "Error al actualizar columna",
-        detail: err,
-      });
+    return reply.code(400).send({
+      success: false,
+      error: "Error al actualizar columna",
+      detail: err,
+    });
   }
 };
 
@@ -255,12 +245,10 @@ export const deleteColumna = async (
       message: "Columna eliminada correctamente",
     });
   } catch (err) {
-    return reply
-      .code(500)
-      .send({
-        success: false,
-        error: "Error al eliminar columna",
-        detail: err,
-      });
+    return reply.code(500).send({
+      success: false,
+      error: "Error al eliminar columna",
+      detail: err,
+    });
   }
 };

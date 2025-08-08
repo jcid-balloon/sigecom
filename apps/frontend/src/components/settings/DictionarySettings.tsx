@@ -489,7 +489,7 @@ const DictionarySettings: React.FC<DictionarySettingsProps> = ({
                         !newColumna.tipoValidacion
                           ? "Sin validación adicional"
                           : newColumna.tipoValidacion === "lista"
-                          ? '["Opción1", "Opción2", "Opción3"]'
+                          ? "Opción1, Opción2, Opción3"
                           : newColumna.tipoValidacion === "regex"
                           ? "^[a-zA-Z]+$"
                           : '{"min": 0, "max": 100}'
@@ -500,7 +500,7 @@ const DictionarySettings: React.FC<DictionarySettingsProps> = ({
                   {newColumna.tipoValidacion && (
                     <p className="text-xs text-gray-500 mt-1">
                       {newColumna.tipoValidacion === "lista" &&
-                        'Formato: ["valor1", "valor2", "valor3"]'}
+                        "Formato: valor1, valor2, valor3"}
                       {newColumna.tipoValidacion === "regex" &&
                         "Formato: expresión regular (ej: ^[a-zA-Z]+$)"}
                       {newColumna.tipoValidacion === "rango" &&
@@ -915,7 +915,7 @@ const DictionarySettings: React.FC<DictionarySettingsProps> = ({
                   {editingData.tipoValidacion && (
                     <p className="text-xs text-gray-500 mt-1">
                       {editingData.tipoValidacion === "lista" &&
-                        'Formato: ["valor1", "valor2", "valor3"]'}
+                        "Formato: valor1, valor2, valor3"}
                       {editingData.tipoValidacion === "regex" &&
                         "Formato: expresión regular (ej: ^[a-zA-Z]+$)"}
                       {editingData.tipoValidacion === "rango" &&

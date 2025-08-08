@@ -4,7 +4,7 @@ import { HistorialDescargaModel } from "@/models/historial/HistorialDescarga";
 import { HistorialModificacionModel } from "@/models/historial/HistorialModificacion";
 import { HistorialCleanupService } from "@/services/HistorialCleanupService";
 
-//  HISTORIAL DE CARGA 
+//  HISTORIAL DE CARGA
 
 export const getHistorialesCarga = async (
   req: FastifyRequest,
@@ -78,7 +78,7 @@ export const getHistorialCargaById = async (
   }
 };
 
-//  HISTORIAL DE MODIFICACIÓN 
+//  HISTORIAL DE MODIFICACIÓN
 
 export const getHistorialesModificacion = async (
   req: FastifyRequest,
@@ -156,7 +156,7 @@ export const getHistorialModificacionById = async (
   }
 };
 
-//  HISTORIAL DE DESCARGA 
+//  HISTORIAL DE DESCARGA
 
 export const getHistorialesDescarga = async (
   req: FastifyRequest,
@@ -230,7 +230,7 @@ export const getHistorialDescargaById = async (
   }
 };
 
-//  HISTORIAL COMPLETO 
+//  HISTORIAL COMPLETO
 
 export const getHistorialCompleto = async (
   req: FastifyRequest,
@@ -354,7 +354,7 @@ export const getHistorialCompleto = async (
   }
 };
 
-//  ESTADÍSTICAS 
+//  ESTADÍSTICAS
 
 export const getEstadisticasHistorial = async (
   req: FastifyRequest,

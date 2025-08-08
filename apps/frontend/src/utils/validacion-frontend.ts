@@ -89,12 +89,12 @@ export class ValidacionFrontend {
     const errores = this.validarFormulario(datos, columnas);
 
     // Verificar unicidad de RUT si existe
-    const rutColumna = columnas.find(col => this.debeFormatearRut(col));
+    const rutColumna = columnas.find((col) => this.debeFormatearRut(col));
     if (rutColumna && datos[rutColumna.nombre]) {
       const rutIngresado = datos[rutColumna.nombre];
-      
+
       // Buscar si ya existe ese RUT en otras personas
-      const rutDuplicado = personasExistentes.find(persona => {
+      const rutDuplicado = personasExistentes.find((persona) => {
         const rutExistente = persona.datosAdicionales?.[rutColumna.nombre];
         return rutExistente === rutIngresado && persona._id !== personaIdActual;
       });
@@ -203,9 +203,37 @@ export class ValidacionFrontend {
       try {
         switch (columna.tipoValidacion) {
           case "lista":
-            const lista = JSON.parse(columna.validacion);
-            if (!Array.isArray(lista) || !lista.includes(valor)) {
-              return `El valor debe ser uno de: ${lista.join(", ")}`;
+            // Manejar tanto JSON como valores separados por comas
+            let opciones: string[] = [];
+            try {
+              // Intentar parsear como JSON primero
+              const parsed = JSON.parse(columna.validacion);
+              if (Array.isArray(parsed)) {
+                opciones = parsed.map((o) => String(o).trim());
+              } else {
+                throw new Error("No es array");
+              }
+            } catch {
+              // Si falla, tratar como valores separados por comas
+              opciones = columna.validacion
+                .split(",")
+                .map((o) => o.trim())
+                .filter((o) => o.length > 0);
+            }
+
+            if (opciones.length === 0) {
+              return `Configuración de lista inválida`;
+            }
+
+            // Comparar el valor (normalizando a string y eliminando espacios)
+            const valorNormalizado = String(valor).trim();
+            const valorValido = opciones.some(
+              (opcion) =>
+                opcion.toLowerCase() === valorNormalizado.toLowerCase()
+            );
+
+            if (!valorValido) {
+              return `El valor debe ser uno de: ${opciones.join(", ")}`;
             }
             break;
 
@@ -272,16 +300,17 @@ export class ValidacionFrontend {
         /rut/i,
         /\d+\.\d+\.\d+-[\dkK]/,
         /^\d{7,8}-[\dkK]$/,
-        /^\d{1,2}\.\d{3}\.\d{3}-[\dkK]$/
+        /^\d{1,2}\.\d{3}\.\d{3}-[\dkK]$/,
       ];
-      
-      return rutPatterns.some(pattern => 
-        pattern.test(columna.validacion!) || 
-        pattern.test(columna.nombre) ||
-        pattern.test(columna.descripcion || '')
+
+      return rutPatterns.some(
+        (pattern) =>
+          pattern.test(columna.validacion!) ||
+          pattern.test(columna.nombre) ||
+          pattern.test(columna.descripcion || "")
       );
     }
-    
+
     // También verificar por nombre de columna
     return /rut/i.test(columna.nombre);
   }
@@ -290,7 +319,7 @@ export class ValidacionFrontend {
    * Formatear valor para preview/visualización
    */
   static formatearValorParaPreview(
-    valor: any, 
+    valor: any,
     columna: DiccionarioColumna
   ): string {
     if (valor === null || valor === undefined || valor === "") {
@@ -307,7 +336,11 @@ export class ValidacionFrontend {
     // Formateo estándar por tipo
     switch (columna.tipo) {
       case "boolean":
-        return valorStr === "true" ? "Sí" : valorStr === "false" ? "No" : valorStr;
+        return valorStr === "true"
+          ? "Sí"
+          : valorStr === "false"
+          ? "No"
+          : valorStr;
       case "date":
         try {
           return new Date(valorStr).toLocaleDateString();
