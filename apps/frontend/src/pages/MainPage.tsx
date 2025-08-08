@@ -9,12 +9,12 @@ import {
 import CargaMasiva from "@/components/CargaMasiva";
 import Historial from "@/components/History";
 import Community from "@/components/Community";
-import Dashboard from "@/components/Dashboard";
+// import Dashboard from "@/components/Dashboard";
 import Settings from "@/components/Settings";
 import type { User } from "@/services/auth.service";
 
 type ActiveTab =
-  | "dashboard"
+  // | "dashboard"
   | "comunidad"
   | "cargaMasiva"
   | "historial"
@@ -26,7 +26,7 @@ interface MainPageProps {
 }
 
 const MainPage = ({ onLogout, currentUser }: MainPageProps): JSX.Element => {
-  const [activeTab, setActiveTab] = useState<ActiveTab>("dashboard");
+  const [activeTab, setActiveTab] = useState<ActiveTab>("configuracion");
 
   //
   const tabs = [
@@ -43,8 +43,8 @@ const MainPage = ({ onLogout, currentUser }: MainPageProps): JSX.Element => {
 
   const renderContent = () => {
     switch (activeTab) {
-      case "dashboard":
-        return <Dashboard />;
+      // case "dashboard":
+      //   return <Dashboard />;
       case "comunidad":
         return <Community />;
       case "cargaMasiva":
@@ -119,8 +119,8 @@ const MainPage = ({ onLogout, currentUser }: MainPageProps): JSX.Element => {
                     {tabs.find((tab) => tab.id === activeTab)?.label}
                   </h2>
                   <p className="mt-1 text-sm text-gray-600">
-                    {activeTab === "dashboard" &&
-                      "Vista general del sistema y estadísticas"}
+                    {/* {activeTab === "dashboard" &&
+                      "Vista general del sistema y estadísticas"} */}
                     {activeTab === "comunidad" &&
                       "Gestiona los datos de la comunidad"}
                     {activeTab === "cargaMasiva" &&
