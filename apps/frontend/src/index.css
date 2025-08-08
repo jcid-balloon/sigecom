@@ -26,6 +26,37 @@
   background: #94a3b8;
 }
 
+/* Estilos para Dashboard */
+.dashboard-widget {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.dashboard-widget:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+.dashboard-widget.dragging {
+  transform: rotate(5deg);
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+}
+
+.widget-resize-handle {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 20px;
+  height: 20px;
+  background: linear-gradient(-45deg, transparent 0%, transparent 30%, #3B82F6 30%, #3B82F6 100%);
+  cursor: se-resize;
+  border-bottom-right-radius: 4px;
+}
+
+.widget-resize-handle:hover {
+  background: linear-gradient(-45deg, transparent 0%, transparent 30%, #2563EB 30%, #2563EB 100%);
+}
+
 /* Animaciones para fullscreen */
 .fullscreen-enter {
   animation: expandToFullscreen 0.3s ease-out;
